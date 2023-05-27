@@ -23,10 +23,10 @@ pip install -r requirements.txt
 
 Tener en cuenta que antes de correr la aplicación, primero tendrás que crear las siguientes variables de entorno dentro de un archivo .env:
 
-MYSQL_USER=
-MYSQL_PASSWORD=
-MYSQL_DATABASE=
-MYSQL_HOST=
+- MYSQL_USER=
+- MYSQL_PASSWORD=
+- MYSQL_DATABASE=
+- MYSQL_HOST=
 
 con sus valores correspondientes.
 
