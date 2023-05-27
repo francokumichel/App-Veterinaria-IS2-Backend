@@ -1,2 +1,39 @@
 # App-Veterinaria-IS2-Backend
-Este repositorio de GitHub es para el backend de un proyecto de Ingenieria en Software como parte de un trabajo para la facultad de Informática de la UNLP. Contiene el código fuente del sistema, la documentación necesaria y los recursos utilizados en el desarrollo del proyecto. El objetivo del sistema es crear una plataforma para la vinculación entre cuidadores, personas y perros, con características destacadas como la ubicación de veterinarias cercanas y la programación de citas y servicios de veterinaria de manera efectiva.  
+
+## Descripción
+
+Este repositorio contiene el código del backend de una página web desarrollada en Python utilizando el framework Flask y la biblioteca SQLAlchemy en el ámbito de de un proyecto de Ingenieria en Software como parte de un trabajo para la facultad de Informática de la UNLP. El backend es responsable de manejar las solicitudes y respuestas entre el cliente y el servidor, así como de interactuar con la base de datos.
+
+## Requerimientos
+
+- Python3
+- MySQL
+
+## Instalación
+
+1. Clona este repositorio en tu máquina local.
+
+2. Navega hasta el directorio del proyecto.
+
+3. Ejecuta el siguiente comando para instalar las dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
+Tener en cuenta que antes de correr la aplicación, primero tendrás que crear las siguientes variables de entorno dentro de un archivo .env:
+
+MYSQL_USER=
+MYSQL_PASSWORD=
+MYSQL_DATABASE=
+MYSQL_HOST=
+
+con sus valores correspondientes.
+
+## Uso
+
+Una vez ejecutados los pasos de instalación, deberá ejecutar el siguiente comando:
+
+```bash
+python index.py
+```
