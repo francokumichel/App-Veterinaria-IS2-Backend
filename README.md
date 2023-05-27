@@ -1,0 +1,2 @@
+# App-Veterinaria-IS2-Backend
+Este repositorio de GitHub es para el backend de un proyecto de Ingenieria en Software como parte de un trabajo para la facultad de Informática de la UNLP. Contiene el código fuente del sistema, la documentación necesaria y los recursos utilizados en el desarrollo del proyecto. El objetivo del sistema es crear una plataforma para la vinculación entre cuidadores, personas y perros, con características destacadas como la ubicación de veterinarias cercanas y la programación de citas y servicios de veterinaria de manera efectiva.  
