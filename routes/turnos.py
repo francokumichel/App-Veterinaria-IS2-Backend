@@ -7,8 +7,8 @@ turnos = Blueprint('turnos', __name__)
 
 @turnos.route("/agregar_turno", methods=["POST"])
 def agregar_turno():
-    horario = request.form.get("horario")
-    motivo = request.form.get("motivo")
+    horario = request.json.get("horario")
+    motivo = request.json.get("motivo")
 
     # Validar los datos del formulario aquí si es necesario
 
@@ -33,6 +33,21 @@ def obtener_turnos():
     return jsonify(turnos_json)
 
 
-@turnos.route("/modificar_turno")
-def modificar_turno():
-    return "Turno modificado satisfactoriamente"
+@turnos.route("/modificar_turno/<id>", methods=["PUT"])
+def modificar_turno(id):
+    turno = Turno.query.get(id)
+    if not turno:
+        return jsonify({"error": "Turno no encontrado"}), 404
+
+    # Obtén los nuevos datos del formulario o solicitud
+    horario = request.json.get("horario")
+    motivo = request.json.get("motivo")
+
+    # Actualiza los campos del turno existente
+    turno.horario = horario
+    turno.motivo = motivo
+
+    # Guarda los cambios en la base de datos
+    db.session.commit()
+
+    return jsonify({"message": "Turno actualizado satisfactoriamente"})
