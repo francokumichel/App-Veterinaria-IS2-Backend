@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, request
-from models.turnos import Turno
+from models.MTurno import Turno
 from utils.db import db
 
-turnos = Blueprint('turnos', __name__)
+turno = Blueprint('turno', __name__)
 
 
-@turnos.route("/agregar_turno", methods=["POST"])
+@turno.route("/turno/add", methods=["POST"])
 def agregar_turno():
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
@@ -19,7 +19,7 @@ def agregar_turno():
     return "Turno agregado satisfactoriamente"
 
 
-@turnos.route("/obtener_turnos", methods=["GET"])
+@turno.route("/turno/get", methods=["GET"])
 def obtener_turnos():
     turnos = Turno.query.all()
     turnos_json = [
@@ -32,8 +32,18 @@ def obtener_turnos():
     ]
     return jsonify(turnos_json)
 
+@turno.route("/turno/getById/<id>", methods=["GET"])
+def obtener_turno_by_id(id):
+    turno = Turno.query.filter_by(id=id).first()
+    turno_json = {
+            "id": turno.id,
+            "horario": turno.horario,
+            "motivo": turno.motivo
+        }
+    return jsonify(turno_json)
 
-@turnos.route("/modificar_turno/<id>", methods=["PUT"])
+
+@turno.route("/turno/put/<id>", methods=["PUT"])
 def modificar_turno(id):
     turno = Turno.query.get(id)
     if not turno:
@@ -51,3 +61,14 @@ def modificar_turno(id):
     db.session.commit()
 
     return jsonify({"message": "Turno actualizado satisfactoriamente"})
+
+@turno.route("/turno/delete/<id>", methods=["DELETE"])
+def eliminar_turno(id):
+    turno = Turno.query.get(id)
+    if not turno:
+        return jsonify({"error": "Turno no encontrado"}), 404
+
+    db.session.delete(turno)
+    db.session.commit()
+
+    return jsonify({"message": "Turno eliminado satisfactoriamente"})

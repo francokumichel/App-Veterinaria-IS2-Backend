@@ -1,6 +1,5 @@
 from utils.db import db
 
-
 class Turno(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     horario = db.Column(db.String(100))
