@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from models.MMascota import Mascota
 from models.MUsuario import Usuario
 from utils.db import db
 
@@ -18,7 +17,7 @@ def agregar_usuario():
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, DNI=DNI, email=email, telefono=telefono, password=password, mascotas=mascotas)
+    nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, DNI=DNI, email=email, telefono=telefono, password=password, mascotas=mascotas, admin=False)
     db.session.add(nuevo_usuario)
     db.session.commit()
 
@@ -37,6 +36,7 @@ def obtener_usuarios():
             "email": usuario.email,
             "telefono": usuario.telefono,
             "password": usuario.password,
+            "admin": usuario.admin,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
         }
         for usuario in usuarios
@@ -54,6 +54,7 @@ def obtener_usuario_by_id(id):
             "email": usuario.email,
             "telefono": usuario.telefono,
             "password": usuario.password,
+            "admin": usuario.admin,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
         }
     return jsonify(usuario_json)
@@ -86,6 +87,25 @@ def modificar_usuario(id):
 
     return jsonify({"message": "Usuario actualizado satisfactoriamente"})
 
+@usuario.route("/usuario/putReducido/<id>", methods=["PUT"])
+def modificar_usuario_reducido(id):
+    usuario = Usuario.query.get(id)
+    if not usuario:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+
+    email = request.json.get("email")
+    password = request.json.get("password")
+
+    # Actualiza los campos del turno existente
+    usuario.email = email
+    usuario.password = password
+
+    # Guarda los cambios en la base de datos
+    db.session.commit()
+
+    return jsonify({"message": "Usuario actualizado satisfactoriamente"})
+
+
 @usuario.route("/usuario/delete/<id>", methods=["DELETE"])
 def eliminar_usuario(id):
     usuario = Usuario.query.get(id)
@@ -113,6 +133,48 @@ def obtener_por_nombre(nombre):
             "email": usuario.email,
             "telefono": usuario.telefono,
             "password": usuario.password,
+            "admin": usuario.admin,
+            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
+        }
+    ]
+
+    return jsonify(usuario_json)
+
+@usuario.route("/login", methods=["POST"])
+def login():
+    user = Usuario.query.filter_by(email=request.json.get("email")).first()
+    if user and (user.password == request.json.get("password")):
+        responseObject = {
+            "status": True,
+            "message": 'Logeado correctamente.',
+            "auth_token": user.email,
+            "authorities": user.admin
+        }
+    else:
+        responseObject = {
+            'status': False,
+            'message': 'Usuario o contraseña incorrectos.',
+            "authorities": user.admin
+        }
+    return jsonify(responseObject)
+
+@usuario.route("/usuario/mainUsuario/<email>", methods=["GET"])
+def main_usuario(email):
+    usuario = Usuario.query.filter_by(email=email).first()
+
+    if not usuario:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+    
+    usuario_json = [
+        {
+            "id": usuario.id,
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido,
+            "DNI": usuario.DNI,
+            "email": usuario.email,
+            "telefono": usuario.telefono,
+            "password": usuario.password,
+            "admin": usuario.admin,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
         }
     ]
