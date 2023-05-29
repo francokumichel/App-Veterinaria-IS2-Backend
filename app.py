@@ -2,6 +2,7 @@ from flask import Flask
 from routes.RTurno import turno
 from routes.RUsuario import usuario
 from routes.RMascota import mascota
+from routes.RAnuncio import anuncio
 from utils.db import init_app
 from config import DATABASE_CONNECTION_URI
 
@@ -15,3 +16,4 @@ init_app(app)
 app.register_blueprint(turno)
 app.register_blueprint(mascota)
 app.register_blueprint(usuario)
+app.register_blueprint(anuncio)
