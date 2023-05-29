@@ -10,6 +10,7 @@ class Usuario(db.Model):
     password = db.Column(db.String(100))
     admin = db.Column(db.Boolean, default=False)
     mascotas = db.relationship('Mascota', backref='usuario', lazy=True, cascade="all, delete-orphan")
+    adopciones = db.relationship('Adopcion', backref='usuario', lazy=True, cascade="all, delete-orphan")
 
     def __init__(self, nombre, apellido, DNI, email, telefono, password, mascotas, admin):
         self.nombre = nombre

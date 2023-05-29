@@ -165,8 +165,7 @@ def main_usuario(email):
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
     
-    usuario_json = [
-        {
+    usuario_json = {
             "id": usuario.id,
             "nombre": usuario.nombre,
             "apellido": usuario.apellido,
@@ -176,7 +175,6 @@ def main_usuario(email):
             "password": usuario.password,
             "admin": usuario.admin,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
-        }
-    ]
+    }
 
     return jsonify(usuario_json)

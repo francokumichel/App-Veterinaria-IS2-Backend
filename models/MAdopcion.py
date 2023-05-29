@@ -5,11 +5,15 @@ class Adopcion(db.Model):
     titulo = db.Column(db.String(100))
     descripcion = db.Column(db.String(500))
     mascota_id = db.Column(db.Integer, db.ForeignKey('mascota.id'), nullable=False)
+    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    finalizada = db.Column(db.Boolean, default=False)
 
-    def __init__(self, titulo, descripcion, mascota_id):
+    def __init__(self, titulo, descripcion, mascota_id, usuario_id, finalizada):
         self.titulo = titulo
         self.descripcion = descripcion
         self.mascota_id = mascota_id
+        self.usuario_id = usuario_id
+        self.finalizada = finalizada
 
     def to_dict(self):
         return {

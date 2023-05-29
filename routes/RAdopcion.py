@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.MAdopcion import Adopcion
+from models.MMascota import Mascota
 from utils.db import db
 
 adopcion = Blueprint('adopcion', __name__)
@@ -10,10 +11,12 @@ def agregar_adopcion():
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     mascota_id = request.json.get("mascota_id")
+    usuario_id = request.json.get("usuario_id")
+    finalizada = False
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_adopcion = Adopcion(titulo=titulo, descripcion=descripcion, mascota_id=mascota_id)
+    nuevo_adopcion = Adopcion(titulo=titulo, descripcion=descripcion, mascota_id=mascota_id, usuario_id=usuario_id, finalizada=finalizada)
     db.session.add(nuevo_adopcion)
     db.session.commit()
 
@@ -28,7 +31,9 @@ def obtener_adopciones():
             "id": adopcion.id,
             "titulo": adopcion.titulo,
             "descripcion": adopcion.descripcion,
-            "mascota_id": adopcion.mascota_id
+            "mascota_id": adopcion.mascota_id,
+            "usuario_id": adopcion.usuario_id,
+            "finalizada": adopcion.finalizada
         }
         for adopcion in adopciones
     ]
@@ -37,11 +42,15 @@ def obtener_adopciones():
 @adopcion.route("/adopcion/getById/<id>", methods=["GET"])
 def obtener_adopcion_by_id(id):
     adopcion = Adopcion.query.filter_by(id=id).first()
+    mascota = Mascota.query.filter_by(id=adopcion.mascota_id).first()
     adopcion_json = {
             "id": adopcion.id,
             "titulo": adopcion.titulo,
             "descripcion": adopcion.descripcion,
-            "mascota_id": adopcion.mascota_id
+            "mascota_id": adopcion.mascota_id,
+            "usuario_id": adopcion.usuario_id,
+            "finalizada": adopcion.finalizada,
+            "mascota": mascota.to_dict()
         }
     return jsonify(adopcion_json)
 
@@ -88,7 +97,9 @@ def buscar_por_mascota_id(id):
             "id": adopcion.id,
             "titulo": adopcion.titulo,
             "descripcion": adopcion.descripcion,
-            "mascota_id": adopcion.mascota_id
+            "mascota_id": adopcion.mascota_id,
+            "usuario_id": adopcion.usuario_id,
+            "finalizada": adopcion.finalizada
         }
 
     return jsonify(mascota_json)
