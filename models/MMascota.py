@@ -9,8 +9,10 @@ class Mascota(db.Model):
     tamano = db.Column(db.String(100))
     sexo = db.Column(db.String(100))
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
+    vacunas = db.relationship('Vacuna', backref='mascota', lazy=True, cascade="all, delete-orphan")
+    adopcion = db.relationship("Adopcion", uselist=False, backref="mascota", cascade="all, delete-orphan")
 
-    def __init__(self, nombre, edad, raza, color, tamano, sexo, usuario_id):
+    def __init__(self, nombre, edad, raza, color, tamano, sexo, usuario_id, vacunas):
         self.nombre = nombre
         self.edad = edad
         self.raza = raza
@@ -18,6 +20,7 @@ class Mascota(db.Model):
         self.tamano = tamano
         self.sexo = sexo
         self.usuario_id = usuario_id
+        self.vacunas = vacunas
 
     def to_dict(self):
         return {

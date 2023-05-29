@@ -14,10 +14,11 @@ def agregar_usuario():
     tamano = request.json.get("tamano")
     sexo = request.json.get("sexo")
     usuario_id = request.json.get("usuario_id")
+    vacunas = []
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_mascota = Mascota(nombre=nombre, edad=edad, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id)
+    nuevo_mascota = Mascota(nombre=nombre, edad=edad, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas)
     db.session.add(nuevo_mascota)
     db.session.commit()
 
@@ -25,7 +26,7 @@ def agregar_usuario():
 
 
 @mascota.route("/mascota/get", methods=["GET"])
-def obtener_usuarios():
+def obtener_mascotas():
     mascotas = Mascota.query.all()
     mascotas_json = [
         {
@@ -37,6 +38,7 @@ def obtener_usuarios():
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
         }
         for mascota in mascotas
     ]
@@ -54,6 +56,7 @@ def obtener_mascota_by_id(id):
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
         }
     return jsonify(mascota_json)
 
@@ -114,6 +117,7 @@ def buscar_por_nombre(id):
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
         }
         for mascota in mascotas
     ]
