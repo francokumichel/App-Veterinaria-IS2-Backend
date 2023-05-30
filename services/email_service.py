@@ -1,13 +1,11 @@
-from app import app
-from flask import render_template
 from flask_mail import Mail, Message
 
-mail = Mail(app)
+mail = Mail()
 
 
 def enviar_email(email, titulo, cuerpo):
     msje_titulo = titulo
-    emisor = "francokumichel1996@mail.com"
+    emisor = "francokumichel1996@gmail.com"
     msje = Message(msje_titulo, sender=emisor, recipients=[email])
     msje_cuerpo = cuerpo
     msje.body = ""
@@ -16,8 +14,6 @@ def enviar_email(email, titulo, cuerpo):
         'titulo': msje_titulo,
         'cuerpo': msje_cuerpo
     }
-
-    msje_html = render_template("email.html", data=data)
 
     try:
         mail.send(msje)

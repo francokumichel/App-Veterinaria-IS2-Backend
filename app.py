@@ -7,6 +7,7 @@ from routes.RVacuna import vacuna
 from routes.RAdopcion import adopcion
 from utils.db import init_app
 from config import DATABASE_CONNECTION_URI
+from services.email_service import mail
 import os
 
 app = Flask(__name__)
@@ -30,3 +31,5 @@ app.register_blueprint(usuario)
 app.register_blueprint(anuncio)
 app.register_blueprint(vacuna)
 app.register_blueprint(adopcion)
+
+mail.init_app(app)  # Inicializo el servicio de email

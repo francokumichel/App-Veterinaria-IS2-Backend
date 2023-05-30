@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models.MTurno import Turno
 from utils.db import db
+from services.email_service import enviar_email
 
 turno = Blueprint('turno', __name__)
 
@@ -9,12 +10,18 @@ turno = Blueprint('turno', __name__)
 def agregar_turno():
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
+    usuario_id = request.json.get("usuario_id")
+    mascota_id = request.json.get("mascota_id")
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_turno = Turno(horario=horario, motivo=motivo)
+    nuevo_turno = Turno(horario=horario, motivo=motivo,
+                        usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
+
+    print(enviar_email("francokumichel1996@gmail.com",
+                       "Prueba", "Este es un email de prueba"))
 
     return "Turno agregado satisfactoriamente"
 
@@ -25,21 +32,30 @@ def obtener_turnos():
     turnos_json = [
         {
             "id": turno.id,
+            "nombre_usuario": turno.usuario.nombre,
+            "apellido_usuario": turno.usuario.apellido,
+            "nombre_mascota": turno.mascota.nombre,
             "horario": turno.horario,
             "motivo": turno.motivo
         }
         for turno in turnos
     ]
+
     return jsonify(turnos_json)
+
 
 @turno.route("/turno/getById/<id>", methods=["GET"])
 def obtener_turno_by_id(id):
     turno = Turno.query.filter_by(id=id).first()
     turno_json = {
-            "id": turno.id,
-            "horario": turno.horario,
-            "motivo": turno.motivo
-        }
+        "id": turno.id,
+        "nombre_usuario": turno.usuario.nombre,
+        "apellido_usuario": turno.usuario.apellido,
+        "nombre_mascota": turno.mascota.nombre,
+        "horario": turno.horario,
+        "motivo": turno.motivo
+    }
+
     return jsonify(turno_json)
 
 
@@ -61,6 +77,7 @@ def modificar_turno(id):
     db.session.commit()
 
     return jsonify({"message": "Turno actualizado satisfactoriamente"})
+
 
 @turno.route("/turno/delete/<id>", methods=["DELETE"])
 def eliminar_turno(id):
