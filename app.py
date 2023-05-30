@@ -7,11 +7,20 @@ from routes.RVacuna import vacuna
 from routes.RAdopcion import adopcion
 from utils.db import init_app
 from config import DATABASE_CONNECTION_URI
+import os
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_CONNECTION_URI
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configuración para envío de emails
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['MAIL_SERVER'] = os.environ['MAIL_SERVER']
+app.config['MAIL_PORT'] = os.environ['MAIL_PORT']
+app.config['MAIL_USERNAME'] = os.environ['MAIL_USERNAME']
+app.config['MAIL_PASSWORD'] = os.environ['MAIL_PASSWORD']
+app.config['MAIL_USE_TLS'] = True
 
 init_app(app)
 
