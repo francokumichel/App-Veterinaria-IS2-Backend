@@ -13,3 +13,4 @@ six==1.16.0
 SQLAlchemy==2.0.15
 typing_extensions==4.6.2
 Werkzeug==2.3.4
+flask_mail==0.9.1
