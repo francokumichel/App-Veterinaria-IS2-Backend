@@ -32,12 +32,12 @@ con sus valores correspondientes.
 
 Además, también deberás configurar las variables de entorno para que la aplicación pueda enviar emails.
 
-SECRET_KEY = Aca poner un password cualquiera
-MAIL_SERVER = Acá poner el servidor que vas a utilizar. Por ejemplo si vas a usar SMTP, sería "smtp.gmail.com"
-MAIL_PORT = Puerto del email. Puede ser 25, 465 o 587 si usas SMTP
-MAIL_USERNAME = Acá iria tu direccion de email desde donde vas a enviar los correos
-MAIL_PASSWORD = Acá iria el password para la aplicación que vas a utilizar
-MAIL_USE_TLS = True
+- SECRET_KEY = Aca poner un password cualquiera
+- MAIL_SERVER = Acá poner el servidor que vas a utilizar. Por ejemplo si vas a usar SMTP, sería "smtp.gmail.com"
+- MAIL_PORT = Puerto del email. Puede ser 25, 465 o 587 si usas SMTP
+- MAIL_USERNAME = Acá iria tu direccion de email desde donde vas a enviar los correos
+- MAIL_PASSWORD = Acá iria el password para la aplicación que vas a utilizar
+- MAIL_USE_TLS = True
 
 ## Uso
 
