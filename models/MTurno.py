@@ -5,6 +5,7 @@ class Turno(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     horario = db.Column(db.String(100))
     motivo = db.Column(db.String(100))
+    estado = db.Column(db.String(100))
     usuario_id = db.Column(db.Integer, db.ForeignKey(
         'usuario.id'), nullable=False)
     usuario = db.relationship(
@@ -15,8 +16,9 @@ class Turno(db.Model):
     mascotas = db.relationship(
         'Mascota', backref='turno', lazy=True)
 
-    def __init__(self, horario, motivo, usuario_id, mascota_id):
+    def __init__(self, horario, motivo, estado, usuario_id, mascota_id):
         self.horario = horario
         self.motivo = motivo
+        self.estado = estado
         self.usuario_id = usuario_id
         self.mascota_id = mascota_id

@@ -15,13 +15,10 @@ def agregar_turno():
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_turno = Turno(horario=horario, motivo=motivo,
+    nuevo_turno = Turno(horario=horario, motivo=motivo, estado="pendiente",
                         usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
-
-    print(enviar_email("francokumichel1996@gmail.com",
-                       "Prueba", "Este es un email de prueba"))
 
     return "Turno agregado satisfactoriamente"
 
