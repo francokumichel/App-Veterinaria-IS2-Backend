@@ -7,13 +7,12 @@ class Anuncio(db.Model):
     zona = db.Column(db.String(100))
     disponibilidad = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
-    admin = db.Column(db.Boolean, default=False)
 
-    def __init__(self, nombre, servicio, zona, email, disponibilidad, admin):
+    def __init__(self, nombre, servicio, zona, email, disponibilidad):
         self.nombre = nombre
         self.servicio = servicio
         self.zona = zona
         self.email = email
         self.disponibilidad = disponibilidad
-        self.admin = admin  
+
         

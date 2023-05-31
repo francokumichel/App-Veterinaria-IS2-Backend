@@ -15,7 +15,7 @@ def agregar_anuncio():
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_anuncio = Anuncio(nombre=nombre, servicio=servicio, zona=zona, disponibilidad=disponibilidad, email=email, admin=False)
+    nuevo_anuncio = Anuncio(nombre=nombre, servicio=servicio, zona=zona, disponibilidad=disponibilidad, email=email)
     db.session.add(nuevo_anuncio)
     db.session.commit()
 
@@ -33,7 +33,6 @@ def obtener_anuncios():
             "zona": anuncio.zona,
             "disponibilidad": anuncio.disponibilidad,
             "email": anuncio.email,
-            "admin": anuncio.admin,
         }
         for anuncio in anuncios
     ]
@@ -49,7 +48,6 @@ def obtener_anuncio_by_id(id):
             "zona": anuncio.zona,
             "disponibilidad": anuncio.disponibilidad,
             "email": anuncio.email,
-            "admin": anuncio.admin,
         }
     return jsonify(anuncio_json)
 
@@ -122,7 +120,6 @@ def obtener_por_zona(zona):
             "zona": anuncio.zona,
             "disponibilidad": anuncio.disponibilidad,
             "email": anuncio.email,
-            "admin": anuncio.admin,
         }
     ]
 
