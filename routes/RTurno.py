@@ -1,7 +1,9 @@
 from flask import Blueprint, jsonify, request
 from models.MTurno import Turno
+from models.MMascota import Mascota
 from utils.db import db
 from services.email_service import enviar_email
+from services.fecha_service import calcular_fecha_turno, es_menor_4_meses
 
 turno = Blueprint('turno', __name__)
 
@@ -13,14 +15,31 @@ def agregar_turno():
     usuario_id = request.json.get("usuario_id")
     mascota_id = request.json.get("mascota_id")
 
-    # Validar los datos del formulario aquí si es necesario
+    mascota = Mascota.query.get(mascota_id)
+
+    if not mascota:
+        return jsonify({"error": "No se encontró la mascota asociada"}), 404
+
+    # Realizar las verificaciones aquí antes de crear el nuevo turno
+    if motivo == "vacunación" and es_menor_4_meses(mascota.edad):
+        # El animal es menor a 4 meses, se programa el turno 21 días después
+        fecha_turno = calcular_fecha_turno(21)
+    elif motivo == "vacunación" and not es_menor_4_meses(mascota.edad):
+        # El animal es mayor a 4 meses, se programa el turno 1 año después
+        fecha_turno = calcular_fecha_turno(365)
+    elif motivo == "vacunación antirrábica" and mascota.es_menor_de_4_meses():
+        # No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses
+        return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"}), 400
+    elif mascota.necesita_vacuna() and not mascota.ha_pasado_1_año_desde_ultima_vacuna():
+        # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
+        return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"}), 400
 
     nuevo_turno = Turno(horario=horario, motivo=motivo, estado="pendiente",
                         usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
 
-    return "Turno agregado satisfactoriamente"
+    return jsonify({"message": "Turno agregado satisfactoriamente", "fecha_turno": fecha_turno})
 
 
 @turno.route("/turno/get", methods=["GET"])
