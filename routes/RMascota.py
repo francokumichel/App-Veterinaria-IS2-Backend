@@ -8,7 +8,7 @@ mascota = Blueprint('mascota', __name__)
 @mascota.route("/mascota/add", methods=["POST"])
 def agregar_usuario():
     nombre = request.json.get("nombre")
-    edad = request.json.get("edad")
+    fechaN = request.json.get("fechaN")
     raza = request.json.get("raza")
     color = request.json.get("color")
     tamano = request.json.get("tamano")
@@ -19,7 +19,7 @@ def agregar_usuario():
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_mascota = Mascota(nombre=nombre, edad=edad, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas, anonima=anonima)
+    nuevo_mascota = Mascota(nombre=nombre, fechaN=fechaN, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas, anonima=anonima)
     db.session.add(nuevo_mascota)
     db.session.commit()
 
@@ -33,7 +33,7 @@ def obtener_mascotas():
         {
             "id": mascota.id,
             "nombre": mascota.nombre,
-            "edad": mascota.edad,
+            "fechaN": mascota.fechaN,
             "raza": mascota.raza,
             "color": mascota.color,
             "tamano": mascota.tamano,
@@ -52,7 +52,7 @@ def obtener_mascota_by_id(id):
     mascota_json = {
             "id": mascota.id,
             "nombre": mascota.nombre,
-            "edad": mascota.edad,
+            "fechaN": mascota.fechaN,
             "raza": mascota.raza,
             "color": mascota.color,
             "tamano": mascota.tamano,
@@ -71,7 +71,7 @@ def modificar_usuario(id):
 
     # Obtén los nuevos datos del formulario o solicitud
     nombre = request.json.get("nombre")
-    edad = request.json.get("edad")
+    fechaN = request.json.get("fechaN")
     raza = request.json.get("raza")
     color = request.json.get("color")
     tamano = request.json.get("tamano")
@@ -80,7 +80,7 @@ def modificar_usuario(id):
 
     # Actualiza los campos del turno existente
     mascota.nombre = nombre
-    mascota.edad = edad
+    mascota.fechaN = fechaN
     mascota.raza = raza
     mascota.color = color
     mascota.tamano = tamano
@@ -114,7 +114,7 @@ def buscar_por_nombre(id):
        {
             "id": mascota.id,
             "nombre": mascota.nombre,
-            "edad": mascota.edad,
+            "fechaN": mascota.fechaN,
             "raza": mascota.raza,
             "color": mascota.color,
             "tamano": mascota.tamano,

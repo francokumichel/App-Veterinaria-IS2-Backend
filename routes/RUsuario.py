@@ -1,12 +1,20 @@
 from flask import Blueprint, jsonify, request
 from models.MUsuario import Usuario
 from utils.db import db
+from services.email_service import enviar_email
 
 usuario = Blueprint('usuario', __name__)
 
 
 @usuario.route("/usuario/add", methods=["POST"])
 def agregar_usuario():
+    usuario = Usuario.query.filter_by(DNI=request.json.get("DNI")).first()
+    if usuario:
+        return jsonify({"error": "Ese DNI ya esta usado"})
+    
+    usuario = Usuario.query.filter_by(email=request.json.get("email")).first()
+    if usuario:
+        return jsonify({"error": "Ese email ya esta usado"})
     nombre = request.json.get("nombre")
     apellido = request.json.get("apellido")
     DNI = request.json.get("DNI")
@@ -20,8 +28,9 @@ def agregar_usuario():
     nuevo_usuario = Usuario(nombre=nombre, apellido=apellido, DNI=DNI, email=email, telefono=telefono, password=password, mascotas=mascotas, admin=False)
     db.session.add(nuevo_usuario)
     db.session.commit()
-
-    return "Usuario agregado satisfactoriamente"
+    
+    enviar_email(email, "Bienvenido a OhMyDog!", "Bienvenido a OhMyDog!, gracias por registrarte en nuestra plataforma. Su contraseña es: " + password)
+    return jsonify({"success": "Usuario agregado satisfactoriamente"})
 
 
 @usuario.route("/usuario/get", methods=["GET"])
@@ -63,8 +72,12 @@ def obtener_usuario_by_id(id):
 @usuario.route("/usuario/put/<id>", methods=["PUT"])
 def modificar_usuario(id):
     usuario = Usuario.query.filter_by(email=request.json.get("email")).first()
-    if usuario and usuario.password != request.json.get("password"):
+    if usuario and usuario.id != request.json.get("id"):
         return jsonify({"error": "Ese email ya esta usado"})
+    
+    usuario = Usuario.query.filter_by(DNI=request.json.get("DNI")).first()
+    if usuario and usuario.id != request.json.get("id"):
+        return jsonify({"error": "Ese DNI ya esta usado"})
 
     usuario = Usuario.query.get(id)
     if not usuario:
@@ -73,7 +86,6 @@ def modificar_usuario(id):
     # Obtén los nuevos datos del formulario o solicitud
     nombre = request.json.get("nombre")
     apellido = request.json.get("apellido")
-    DNI = request.json.get("DNI")
     email = request.json.get("email")
     telefono = request.json.get("telefono")
     password = request.json.get("password")
@@ -81,7 +93,6 @@ def modificar_usuario(id):
     # Actualiza los campos del turno existente
     usuario.nombre = nombre
     usuario.apellido = apellido
-    usuario.DNI = DNI
     usuario.email = email
     usuario.telefono = telefono
     usuario.password = password
@@ -94,7 +105,7 @@ def modificar_usuario(id):
 @usuario.route("/usuario/putReducido/<id>", methods=["PUT"])
 def modificar_usuario_reducido(id):
     usuario = Usuario.query.filter_by(email=request.json.get("email")).first()
-    if usuario and usuario.password != request.json.get("password"):
+    if usuario and usuario.id != request.json.get("id"):
         return jsonify({"error": "Ese email ya esta usado"})
     
     usuario = Usuario.query.get(id)
@@ -151,18 +162,26 @@ def obtener_por_nombre(nombre):
 @usuario.route("/login", methods=["POST"])
 def login():
     user = Usuario.query.filter_by(email=request.json.get("email")).first()
-    if user and (user.password == request.json.get("password")):
+    if (not user):
+       responseObject = {
+            'status': False,
+            'message': 'Correo inexistente.'
+        }
+
+    if (user) and (user.password != request.json.get("password")):
+        responseObject = {
+            'status': False,
+            'message': 'Contraseña incorrecta.'
+        }
+    
+    if (user) and (user.password == request.json.get("password")): 
         responseObject = {
             "status": True,
             "message": 'Logeado correctamente.',
             "auth_token": user.email,
             "authorities": user.admin
         }
-    else:
-        responseObject = {
-            'status': False,
-            'message': 'Usuario o contraseña incorrectos.'
-        }
+
     return jsonify(responseObject)
 
 @usuario.route("/usuario/mainUsuario/<email>", methods=["GET"])
