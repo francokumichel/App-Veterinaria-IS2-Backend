@@ -37,7 +37,7 @@ def obtener_usuarios():
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
-            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
+            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
         }
         for usuario in usuarios
     ]
@@ -55,13 +55,17 @@ def obtener_usuario_by_id(id):
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
-            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
+            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
         }
     return jsonify(usuario_json)
 
 
 @usuario.route("/usuario/put/<id>", methods=["PUT"])
 def modificar_usuario(id):
+    usuario = Usuario.query.filter_by(email=request.json.get("email")).first()
+    if usuario and usuario.password != request.json.get("password"):
+        return jsonify({"error": "Ese email ya esta usado"})
+
     usuario = Usuario.query.get(id)
     if not usuario:
         return jsonify({"error": "Usuario no encontrado"}), 404
@@ -85,13 +89,17 @@ def modificar_usuario(id):
     # Guarda los cambios en la base de datos
     db.session.commit()
 
-    return jsonify({"message": "Usuario actualizado satisfactoriamente"})
+    return jsonify({"success": "Usuario actualizado satisfactoriamente"})
 
 @usuario.route("/usuario/putReducido/<id>", methods=["PUT"])
 def modificar_usuario_reducido(id):
+    usuario = Usuario.query.filter_by(email=request.json.get("email")).first()
+    if usuario and usuario.password != request.json.get("password"):
+        return jsonify({"error": "Ese email ya esta usado"})
+    
     usuario = Usuario.query.get(id)
     if not usuario:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify({"error": "Usuario no encontrado"})
 
     email = request.json.get("email")
     password = request.json.get("password")
@@ -103,7 +111,7 @@ def modificar_usuario_reducido(id):
     # Guarda los cambios en la base de datos
     db.session.commit()
 
-    return jsonify({"message": "Usuario actualizado satisfactoriamente"})
+    return jsonify({"success": "Usuario actualizado satisfactoriamente"})
 
 
 @usuario.route("/usuario/delete/<id>", methods=["DELETE"])
@@ -134,7 +142,7 @@ def obtener_por_nombre(nombre):
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
-            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
+            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
         }
     ]
 
@@ -153,8 +161,7 @@ def login():
     else:
         responseObject = {
             'status': False,
-            'message': 'Usuario o contraseña incorrectos.',
-            "authorities": user.admin
+            'message': 'Usuario o contraseña incorrectos.'
         }
     return jsonify(responseObject)
 
@@ -174,7 +181,7 @@ def main_usuario(email):
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
-            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas]
+            "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
     }
 
     return jsonify(usuario_json)

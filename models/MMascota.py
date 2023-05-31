@@ -11,8 +11,9 @@ class Mascota(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     vacunas = db.relationship('Vacuna', backref='mascota', lazy=True, cascade="all, delete-orphan")
     adopcion = db.relationship("Adopcion", uselist=False, backref="mascota", cascade="all, delete-orphan")
+    anonima = db.Column(db.Boolean, default=False)
 
-    def __init__(self, nombre, edad, raza, color, tamano, sexo, usuario_id, vacunas):
+    def __init__(self, nombre, edad, raza, color, tamano, sexo, usuario_id, vacunas, anonima):
         self.nombre = nombre
         self.edad = edad
         self.raza = raza
@@ -21,6 +22,7 @@ class Mascota(db.Model):
         self.sexo = sexo
         self.usuario_id = usuario_id
         self.vacunas = vacunas
+        self.anonima = anonima
 
     def to_dict(self):
         return {
@@ -31,5 +33,6 @@ class Mascota(db.Model):
             "color": self.color,
             "tamano": self.tamano,
             "sexo": self.sexo,
-            "usuario_id": self.usuario_id
+            "usuario_id": self.usuario_id,
+            "anonima": self.anonima
         }

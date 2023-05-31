@@ -15,14 +15,15 @@ def agregar_usuario():
     sexo = request.json.get("sexo")
     usuario_id = request.json.get("usuario_id")
     vacunas = []
+    anonima = request.json.get("anonima")
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_mascota = Mascota(nombre=nombre, edad=edad, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas)
+    nuevo_mascota = Mascota(nombre=nombre, edad=edad, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas, anonima=anonima)
     db.session.add(nuevo_mascota)
     db.session.commit()
 
-    return "Mascota agregado satisfactoriamente"
+    return jsonify({"mascota_id": nuevo_mascota.id})
 
 
 @mascota.route("/mascota/get", methods=["GET"])
@@ -38,7 +39,8 @@ def obtener_mascotas():
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
-            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+            "anonima": mascota.anonima
         }
         for mascota in mascotas
     ]
@@ -56,7 +58,8 @@ def obtener_mascota_by_id(id):
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
-            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+            "anonima": mascota.anonima
         }
     return jsonify(mascota_json)
 
@@ -102,7 +105,7 @@ def eliminar_usuario(id):
 
 @mascota.route("/mascota/getByUsuarioId/<id>", methods=["GET"])
 def buscar_por_nombre(id):
-    mascotas = Mascota.query.filter_by(usuario_id=id)
+    mascotas = Mascota.query.filter_by(usuario_id=id).filter_by(anonima=False).all()
 
     if not mascotas:
         return jsonify({"error": "Mascotas no encontradas"}), 404
@@ -117,7 +120,8 @@ def buscar_por_nombre(id):
             "tamano": mascota.tamano,
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
-            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas]
+            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+            "anonima": mascota.anonima
         }
         for mascota in mascotas
     ]

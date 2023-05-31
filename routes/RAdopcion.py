@@ -1,13 +1,18 @@
 from flask import Blueprint, jsonify, request
 from models.MAdopcion import Adopcion
 from models.MMascota import Mascota
+from models.MUsuario import Usuario
 from utils.db import db
+from services.email_service import enviar_email
 
 adopcion = Blueprint('adopcion', __name__)
 
 
 @adopcion.route("/adopcion/add", methods=["POST"])
 def agregar_adopcion():
+    adopcion = Adopcion.query.filter_by(mascota_id=request.json.get("mascota_id")).first()
+    if adopcion:
+        return jsonify({"error": "Mascota ya utilizada en otra adopcion"})
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     mascota_id = request.json.get("mascota_id")
@@ -20,7 +25,7 @@ def agregar_adopcion():
     db.session.add(nuevo_adopcion)
     db.session.commit()
 
-    return "Adopcion agregado satisfactoriamente"
+    return jsonify({"success": "Adopcion agregada exitosamente"})
 
 
 @adopcion.route("/adopcion/get", methods=["GET"])
@@ -32,6 +37,7 @@ def obtener_adopciones():
             "titulo": adopcion.titulo,
             "descripcion": adopcion.descripcion,
             "mascota_id": adopcion.mascota_id,
+            "mascota": Mascota.query.filter_by(id=adopcion.mascota_id).first().to_dict(),
             "usuario_id": adopcion.usuario_id,
             "finalizada": adopcion.finalizada
         }
@@ -64,11 +70,13 @@ def modificar_adopcion(id):
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     mascota_id = request.json.get("mascota_id")
+    finalizada = request.json.get("finalizada")
 
     # Actualiza los campos del turno existente
     adopcion.titulo = titulo
     adopcion.descripcion = descripcion
     adopcion.mascota_id = mascota_id
+    adopcion.finalizada = finalizada
 
     # Guarda los cambios en la base de datos
     db.session.commit()
@@ -103,3 +111,12 @@ def buscar_por_mascota_id(id):
         }
 
     return jsonify(mascota_json)
+
+@adopcion.route("/adopcion/enviarMail", methods=["POST"])
+def mandar_mails():
+    email = request.json.get("email")
+    usuario_id = request.json.get("usuario_id")
+    usuario = Usuario.query.filter_by(id=usuario_id).first()
+    enviar_email(usuario.email, "Adopcion", "Se ha registrado una adopción con exito del usuario con email: " + email + ". Contactese con el para mas informacion.")
+    message = enviar_email(email, "Adopcion", "Tu solicitación de adopción ha sido exitosa, el usuario con el que quieres comunicarte tiene email: " + usuario.email + ". Contactese con el para mas informacion.")
+    return jsonify({"message": message})

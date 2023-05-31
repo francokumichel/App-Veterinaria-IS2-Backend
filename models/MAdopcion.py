@@ -20,5 +20,6 @@ class Adopcion(db.Model):
             "id": self.id,
             "nombre": self.titulo,
             "fecha": self.descripcion,
-            "mascota_id": self.mascota_id
+            "mascota_id": self.mascota_id,
+            "usuario_id": self.usuario_id
         }
