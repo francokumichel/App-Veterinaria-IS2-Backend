@@ -19,7 +19,8 @@ def agregar_usuario():
 
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_mascota = Mascota(nombre=nombre, fechaN=fechaN, raza=raza, color=color, tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas, anonima=anonima)
+    nuevo_mascota = Mascota(nombre=nombre, fechaN=fechaN, raza=raza, color=color,
+                            tamano=tamano, sexo=sexo, usuario_id=usuario_id, vacunas=vacunas, anonima=anonima)
     db.session.add(nuevo_mascota)
     db.session.commit()
 
@@ -46,22 +47,24 @@ def obtener_mascotas():
     ]
     return jsonify(mascotas_json)
 
+
 @mascota.route("/mascota/getById/<id>", methods=["GET"])
 def obtener_mascota_by_id(id):
     mascota = Mascota.query.filter_by(id=id).first()
     mascota_json = {
-            "id": mascota.id,
-            "nombre": mascota.nombre,
-            "fechaN": mascota.fechaN,
-            "raza": mascota.raza,
-            "color": mascota.color,
-            "tamano": mascota.tamano,
-            "sexo": mascota.sexo,
-            "usuario_id": mascota.usuario_id,
-            "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
-            "anonima": mascota.anonima
-        }
+        "id": mascota.id,
+        "nombre": mascota.nombre,
+        "fechaN": mascota.fechaN,
+        "raza": mascota.raza,
+        "color": mascota.color,
+        "tamano": mascota.tamano,
+        "sexo": mascota.sexo,
+        "usuario_id": mascota.usuario_id,
+        "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+        "anonima": mascota.anonima
+    }
     return jsonify(mascota_json)
+
 
 @mascota.route("/mascota/put/<id>", methods=["PUT"])
 def modificar_usuario(id):
@@ -92,6 +95,7 @@ def modificar_usuario(id):
 
     return jsonify({"message": "Mascota actualizado satisfactoriamente"})
 
+
 @mascota.route("/mascota/delete/<id>", methods=["DELETE"])
 def eliminar_usuario(id):
     mascota = Mascota.query.get(id)
@@ -103,18 +107,26 @@ def eliminar_usuario(id):
 
     return jsonify({"message": "Mascota eliminado satisfactoriamente"})
 
+
 @mascota.route("/mascota/getByUsuarioId/<id>", methods=["GET"])
 def buscar_por_nombre(id):
-    mascotas = Mascota.query.filter_by(usuario_id=id).filter_by(anonima=False).all()
+    # Obtener el parámetro del nombre de mascota de la solicitud
+    nombre_mascota = request.args.get("nombre")
+    mascotas = Mascota.query.filter_by(
+        usuario_id=id).filter_by(anonima=False).all()
+
+    if nombre_mascota:
+        mascotas_query = mascotas_query.filter(Mascota.nombre.ilike(
+            f"%{nombre_mascota}%"))  # Filtrar por nombre de mascota si se proporciona
 
     if not mascotas:
         return jsonify({"error": "Mascotas no encontradas"}), 404
-    
+
     mascotas_json = [
-       {
+        {
             "id": mascota.id,
             "nombre": mascota.nombre,
-            "fechaN": mascota.fechaN,
+            "edad": mascota.edad,
             "raza": mascota.raza,
             "color": mascota.color,
             "tamano": mascota.tamano,

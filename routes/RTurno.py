@@ -3,7 +3,7 @@ from models.MTurno import Turno
 from models.MMascota import Mascota
 from utils.db import db
 from services.email_service import enviar_email
-from services.fecha_service import calcular_fecha_turno, es_menor_4_meses
+from services.fecha_service import calcular_fecha_turno, es_menor_4_meses, ha_pasado_1_año_desde_ultima_vacuna
 
 turno = Blueprint('turno', __name__)
 
@@ -21,18 +21,20 @@ def agregar_turno():
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
 
     # Realizar las verificaciones aquí antes de crear el nuevo turno
-    if motivo == "vacunación" and es_menor_4_meses(mascota.edad):
-        # El animal es menor a 4 meses, se programa el turno 21 días después
-        fecha_turno = calcular_fecha_turno(21)
-    elif motivo == "vacunación" and not es_menor_4_meses(mascota.edad):
-        # El animal es mayor a 4 meses, se programa el turno 1 año después
-        fecha_turno = calcular_fecha_turno(365)
-    elif motivo == "vacunación antirrábica" and mascota.es_menor_de_4_meses():
-        # No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses
-        return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"}), 400
-    elif mascota.necesita_vacuna() and not mascota.ha_pasado_1_año_desde_ultima_vacuna():
-        # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
-        return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"}), 400
+    if "vacunación".lower() in motivo.lower():
+        if ha_pasado_1_año_desde_ultima_vacuna(mascota.nombre, motivo):
+            # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
+            return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"}), 400
+        elif es_menor_4_meses(mascota.fechaN):
+            if "antirrabica".lower() in motivo.lower():
+                # No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses
+                return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"}), 400
+            else:
+                # El animal es menor a 4 meses, se programa el turno 21 días después
+                fecha_turno = calcular_fecha_turno(21)
+        else:
+            # El animal es mayor a 4 meses, se programa el turno 1 año después
+            fecha_turno = calcular_fecha_turno(365)
 
     nuevo_turno = Turno(horario=horario, motivo=motivo, estado="pendiente",
                         usuario_id=usuario_id, mascota_id=mascota_id)
@@ -92,6 +94,10 @@ def modificar_turno(id):
     # Guarda los cambios en la base de datos
     db.session.commit()
 
+    enviar_email("francokumichel1996@gmail.com",
+                 "Modificación de turno",
+                 f"Su turno ha sido modificado por el siguiente horario y motivo: /n Horario: {turno.horario} /n {turno.motivo}")
+
     return jsonify({"message": "Turno actualizado satisfactoriamente"})
 
 
@@ -105,3 +111,17 @@ def eliminar_turno(id):
     db.session.commit()
 
     return jsonify({"message": "Turno eliminado satisfactoriamente"})
+
+
+@turno.route("/turno/cambiar_estado/<id>", methods=["PUT"])
+def cambiar_estado_turno(id):
+    estado_nuevo = request.json.get("estado")
+
+    turno = Turno.query.get(id)
+    if not turno:
+        return jsonify({"error": "Turno no encontrado"}), 404
+
+    turno.estado = estado_nuevo
+    db.session.commit()
+
+    return jsonify({"message": "Estado del turno actualizado satisfactoriamente"})
