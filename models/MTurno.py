@@ -8,13 +8,8 @@ class Turno(db.Model):
     estado = db.Column(db.String(100))
     usuario_id = db.Column(db.Integer, db.ForeignKey(
         'usuario.id'), nullable=False)
-    usuario = db.relationship(
-        'Usuario', backref='turno', lazy=True)
-
     mascota_id = db.Column(db.Integer, db.ForeignKey(
         'mascota.id'), nullable=False)
-    mascotas = db.relationship(
-        'Mascota', backref='turno', lazy=True)
 
     def __init__(self, horario, motivo, estado, usuario_id, mascota_id):
         self.horario = horario

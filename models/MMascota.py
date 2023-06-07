@@ -1,16 +1,22 @@
 from utils.db import db
 
+
 class Mascota(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100))
-    fechaN =  db.Column(db.Date())
+    fechaN = db.Column(db.Date())
     raza = db.Column(db.String(100))
     color = db.Column(db.String(100))
     tamano = db.Column(db.String(100))
     sexo = db.Column(db.String(100))
-    usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    vacunas = db.relationship('Vacuna', backref='mascota', lazy=True, cascade="all, delete-orphan")
-    adopcion = db.relationship("Adopcion", uselist=False, backref="mascota", cascade="all, delete-orphan")
+    usuario_id = db.Column(db.Integer, db.ForeignKey(
+        'usuario.id'), nullable=False)
+    vacunas = db.relationship(
+        'Vacuna', backref='mascota', lazy=True, cascade="all, delete-orphan")
+    turnos = db.relationship('Turno', backref='mascota',
+                             lazy=True, cascade="all, delete-orphan")
+    adopcion = db.relationship(
+        "Adopcion", uselist=False, backref="mascota", cascade="all, delete-orphan")
     anonima = db.Column(db.Boolean, default=False)
 
     def __init__(self, nombre, fechaN, raza, color, tamano, sexo, usuario_id, vacunas, anonima):

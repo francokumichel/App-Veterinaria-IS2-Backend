@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models.MTurno import Turno
 from models.MMascota import Mascota
+from models.MUsuario import Usuario
 from utils.db import db
 from services.email_service import enviar_email
 from services.fecha_service import calcular_fecha_turno, es_menor_4_meses, ha_pasado_1_año_desde_ultima_vacuna
@@ -16,6 +17,8 @@ def agregar_turno():
     mascota_id = request.json.get("mascota_id")
 
     mascota = Mascota.query.get(mascota_id)
+    usuario = Usuario.query.get(usuario_id)
+    admin = Usuario.query.get(admin == True)
 
     if not mascota:
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
@@ -40,7 +43,8 @@ def agregar_turno():
                         usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
-
+    enviar_email(admin.email, "Solicitud de turno",
+                 f"El usuario {usuario.nombre} ha solicitado un turno en el horario de {turno.horario} y motivo {turno.motivo}. Ante cualquier consulta, contactese con {usuario.email}")
     return jsonify({"message": "Turno agregado satisfactoriamente", "fecha_turno": fecha_turno})
 
 
@@ -67,11 +71,10 @@ def obtener_turno_by_id(id):
     turno = Turno.query.filter_by(id=id).first()
     turno_json = {
         "id": turno.id,
-        "nombre_usuario": turno.usuario.nombre,
-        "apellido_usuario": turno.usuario.apellido,
-        "nombre_mascota": turno.mascota.nombre,
         "horario": turno.horario,
-        "motivo": turno.motivo
+        "motivo": turno.motivo,
+        "usuario_id": turno.usuario_id,
+        "mascota_id": turno.mascota_id
     }
 
     return jsonify(turno_json)
@@ -83,18 +86,19 @@ def modificar_turno(id):
     if not turno:
         return jsonify({"error": "Turno no encontrado"}), 404
 
-    # Obtén los nuevos datos del formulario o solicitud
+    # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
 
-    # Actualiza los campos del turno existente
+    # Actualizo los campos del turno existente
     turno.horario = horario
     turno.motivo = motivo
 
-    # Guarda los cambios en la base de datos
+    # Guardo los cambios en la base de datos
     db.session.commit()
 
-    enviar_email("francokumichel1996@gmail.com",
+    usuario = Usuario.query.filter_by(id=turno.usuario_id).first()
+    enviar_email(usuario.email,
                  "Modificación de turno",
                  f"Su turno ha sido modificado por el siguiente horario y motivo: /n Horario: {turno.horario} /n {turno.motivo}")
 
@@ -116,6 +120,7 @@ def eliminar_turno(id):
 @turno.route("/turno/cambiar_estado/<id>", methods=["PUT"])
 def cambiar_estado_turno(id):
     estado_nuevo = request.json.get("estado")
+    email = request.json.get("email")
 
     turno = Turno.query.get(id)
     if not turno:
@@ -123,5 +128,7 @@ def cambiar_estado_turno(id):
 
     turno.estado = estado_nuevo
     db.session.commit()
+    enviar_email(email, f"Turno {estado_nuevo}",
+                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {email}")
 
-    return jsonify({"message": "Estado del turno actualizado satisfactoriamente"})
+    return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
