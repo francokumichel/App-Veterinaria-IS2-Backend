@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from models.MAnuncio import Anuncio
 from utils.db import db
+from services.email_service import enviar_email
 
 anuncio = Blueprint('anuncio', __name__)
 
@@ -124,3 +125,11 @@ def obtener_por_zona(zona):
     ]
 
     return jsonify(anuncio_json)
+
+@anuncio.route("/anuncio/enviarMail", methods=["POST"])
+def mandar_mails():
+    email_anunciante = request.json.get("email_anunciante")
+    email_interesado = request.json.get("email_interesado")
+    enviar_email(email_anunciante, "Anuncio de Trabajo", "Se ha registrado un interesado en su anuncio de trabajo. Su email es: " + email_interesado + ". Contactese con el para mas informacion.")
+    message = enviar_email(email_interesado, "Anuncio de Trabajo", "El email del anunciante en el que estas interesado es: " + email_anunciante + ". Contactese con el para mas informacion.")
+    return jsonify({"message": message})

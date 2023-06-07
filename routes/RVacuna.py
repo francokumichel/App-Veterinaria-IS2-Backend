@@ -1,12 +1,17 @@
 from flask import Blueprint, jsonify, request
 from models.MVacuna import Vacuna
 from utils.db import db
+from datetime import datetime, timedelta
 
 vacuna = Blueprint('vacuna', __name__)
 
 
 @vacuna.route("/vacuna/add", methods=["POST"])
 def agregar_vacuna():
+    fecha_vacunacion = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
+    if (datetime.now() < fecha_vacunacion):
+        return jsonify({"error": "Fecha de vacunacion no puede ser mayor a la fecha actual" })
+    
     nombre = request.json.get("nombre")
     fecha = request.json.get("fecha")
     mascota_id = request.json.get("mascota_id")
@@ -17,7 +22,7 @@ def agregar_vacuna():
     db.session.add(nuevo_vacuna)
     db.session.commit()
 
-    return "Vacuna agregado satisfactoriamente"
+    return jsonify({"success": "Vacuna agregado satisfactoriamente"})
 
 
 @vacuna.route("/vacuna/get", methods=["GET"])
@@ -49,7 +54,11 @@ def obtener_vacuna_by_id(id):
 def modificar_vacuna(id):
     vacuna = Vacuna.query.get(id)
     if not vacuna:
-        return jsonify({"error": "Vacuna no encontrado"}), 404
+        return jsonify({"error": "Vacuna no encontrado"})
+    
+    fecha_vacunacion = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
+    if (datetime.now() < fecha_vacunacion):
+        return jsonify({"error": "Fecha de vacunacion no puede ser mayor a la fecha actual" })
 
     # Obtén los nuevos datos del formulario o solicitud
     nombre = request.json.get("nombre")
@@ -70,7 +79,7 @@ def modificar_vacuna(id):
 def eliminar_vacuna(id):
     vacuna = Vacuna.query.get(id)
     if not vacuna:
-        return jsonify({"error": "Vacuna no encontrado"}), 404
+        return jsonify({"error": "Vacuna no encontrado"})
 
     db.session.delete(vacuna)
     db.session.commit()
@@ -82,7 +91,7 @@ def buscar_por_mascota_id(id):
     vacunas = Vacuna.query.filter_by(mascota_id=id)
 
     if not vacunas:
-        return jsonify({"error": "Vacunas no encontradas"}), 404
+        return jsonify({"error": "Vacunas no encontradas"})
     
     vacunas_json = [
        {

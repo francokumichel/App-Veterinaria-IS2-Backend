@@ -117,6 +117,6 @@ def mandar_mails():
     email = request.json.get("email")
     usuario_id = request.json.get("usuario_id")
     usuario = Usuario.query.filter_by(id=usuario_id).first()
-    enviar_email(usuario.email, "Adopcion", "Se ha registrado una adopción con exito del usuario con email: " + email + ". Contactese con el para mas informacion.")
+    enviar_email(usuario.email, "Adopcion", "Se ha registrado un interesado en la adopción de su mascota. Su email es: " + email + ". Contactese con el para mas informacion.")
     message = enviar_email(email, "Adopcion", "Tu solicitación de adopción ha sido exitosa, el usuario con el que quieres comunicarte tiene email: " + usuario.email + ". Contactese con el para mas informacion.")
     return jsonify({"message": message})

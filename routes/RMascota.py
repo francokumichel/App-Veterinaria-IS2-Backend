@@ -1,12 +1,17 @@
 from flask import Blueprint, jsonify, request
 from models.MMascota import Mascota
 from utils.db import db
+from datetime import datetime, timedelta
 
 mascota = Blueprint('mascota', __name__)
 
 
 @mascota.route("/mascota/add", methods=["POST"])
-def agregar_usuario():
+def agregar_mascota():
+    fecha_nacimiento = datetime.strptime(request.json.get("fechaN"), "%Y-%m-%d")
+    if (datetime.now() < fecha_nacimiento):
+        return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
+    
     nombre = request.json.get("nombre")
     fechaN = request.json.get("fechaN")
     raza = request.json.get("raza")
@@ -71,6 +76,10 @@ def modificar_usuario(id):
     mascota = Mascota.query.get(id)
     if not mascota:
         return jsonify({"error": "Mascota no encontrado"}), 404
+    
+    fecha_nacimiento = datetime.strptime(request.json.get("fechaN"), "%Y-%m-%d")
+    if (datetime.now() < fecha_nacimiento):
+        return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
 
     # Obtén los nuevos datos del formulario o solicitud
     nombre = request.json.get("nombre")
@@ -126,7 +135,7 @@ def buscar_por_nombre(id):
         {
             "id": mascota.id,
             "nombre": mascota.nombre,
-            "edad": mascota.edad,
+            "fechaN": mascota.fechaN,
             "raza": mascota.raza,
             "color": mascota.color,
             "tamano": mascota.tamano,
