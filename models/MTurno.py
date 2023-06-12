@@ -6,6 +6,7 @@ class Turno(db.Model):
     horario = db.Column(db.String(100))
     motivo = db.Column(db.String(100))
     estado = db.Column(db.String(100))
+    fecha = db.Column(db.DateTime(timezone=False))
     usuario_id = db.Column(db.Integer, db.ForeignKey(
         'usuario.id'), nullable=False)
     mascota_id = db.Column(db.Integer, db.ForeignKey(

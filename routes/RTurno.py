@@ -5,6 +5,7 @@ from models.MUsuario import Usuario
 from utils.db import db
 from services.email_service import enviar_email
 from services.fecha_service import calcular_fecha_turno, es_menor_4_meses, ha_pasado_1_año_desde_ultima_vacuna
+from datetime import datetime
 
 turno = Blueprint('turno', __name__)
 
@@ -85,6 +86,10 @@ def modificar_turno(id):
     turno = Turno.query.get(id)
     if not turno:
         return jsonify({"error": "Turno no encontrado"}), 404
+
+    fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
+    if (datetime.now() < fecha_turno):
+        return jsonify({"error": "Fecha de vacunacion no puede ser mayor a la fecha actual"})
 
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
