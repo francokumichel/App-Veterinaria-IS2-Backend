@@ -40,5 +40,8 @@ class Mascota(db.Model):
             "tamano": self.tamano,
             "sexo": self.sexo,
             "usuario_id": self.usuario_id,
-            "anonima": self.anonima
+            "anonima": self.anonima,
+            "vacunas": [vacuna.to_dict() for vacuna in self.vacunas],
+            "turnos": [turno.to_dict() for turno in self.turnos],
+            "adopcion": self.adopcion.to_dict() if self.adopcion else None
         }

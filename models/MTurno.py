@@ -18,3 +18,14 @@ class Turno(db.Model):
         self.estado = estado
         self.usuario_id = usuario_id
         self.mascota_id = mascota_id
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "horario": self.horario,
+            "motivo": self.motivo,
+            "estado": self.estado,
+            "fecha": self.fecha,
+            "usuario_id": self.usuario_id,
+            "mascota_id": self.mascota_id
+        }

@@ -18,8 +18,8 @@ class Adopcion(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "nombre": self.titulo,
-            "fecha": self.descripcion,
+            "titulo": self.titulo,
+            "descripcion": self.descripcion,
             "mascota_id": self.mascota_id,
             "usuario_id": self.usuario_id
         }

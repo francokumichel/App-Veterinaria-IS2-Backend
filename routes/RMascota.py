@@ -12,6 +12,11 @@ def agregar_mascota():
     if (datetime.now() < fecha_nacimiento):
         return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
     
+    #Chequear que no exista otra mascota con el mismo nombre
+    mascota = Mascota.query.filter_by(nombre=request.json.get("nombre")).first()
+    if mascota:
+        return jsonify({"error": "Ya existe una mascota con ese nombre. Por favor cambialo." })
+    
     nombre = request.json.get("nombre")
     fechaN = request.json.get("fechaN")
     raza = request.json.get("raza")
@@ -46,6 +51,8 @@ def obtener_mascotas():
             "sexo": mascota.sexo,
             "usuario_id": mascota.usuario_id,
             "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+            "turnos": [turnos.to_dict() for turnos in mascota.turnos],
+            "adopcion": mascota.adopcion.to_dict() if mascota.adopcion else None,
             "anonima": mascota.anonima
         }
         for mascota in mascotas
@@ -66,6 +73,8 @@ def obtener_mascota_by_id(id):
         "sexo": mascota.sexo,
         "usuario_id": mascota.usuario_id,
         "vacunas": [vacunas.to_dict() for vacunas in mascota.vacunas],
+        "turnos": [turnos.to_dict() for turnos in mascota.turnos],
+        "adopcion": mascota.adopcion.to_dict() if mascota.adopcion else None,
         "anonima": mascota.anonima
     }
     return jsonify(mascota_json)
