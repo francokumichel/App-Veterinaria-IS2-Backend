@@ -73,3 +73,20 @@ def eliminar_campania(id):
     db.session.commit()
 
     return jsonify({"message": "Campaña eliminada satisfactoriamente"})
+
+@campania.route("/campania/getByTitulo/<titulo>", methods=["GET"])
+def obtener_por_titulo(titulo):
+    campania = Campania.query.filter_by(titulo=titulo).first()
+
+    if not campania:
+        return jsonify({"error": "Campaña no encontrada"}), 404
+    
+    campania_json = [
+        {
+            "id": campania.id,
+            "titulo": campania.titulo,
+            "descripcion": campania.descripcion,
+        }
+    ]
+
+    return jsonify(campania_json)
