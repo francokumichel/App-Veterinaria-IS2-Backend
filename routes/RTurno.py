@@ -19,7 +19,11 @@ def agregar_turno():
 
     mascota = Mascota.query.get(mascota_id)
     usuario = Usuario.query.get(usuario_id)
-    admin = Usuario.query.get(admin == True)
+    admin = Usuario.query.filter_by(admin=True).first()
+
+    fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
+    if (datetime.now() > fecha_turno):
+        return jsonify({"error": "Fecha de turno no puede ser mayor a la fecha actual"})
 
     if not mascota:
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
@@ -41,11 +45,11 @@ def agregar_turno():
             fecha_turno = calcular_fecha_turno(365)
 
     nuevo_turno = Turno(horario=horario, motivo=motivo, estado="pendiente",
-                        usuario_id=usuario_id, mascota_id=mascota_id)
+                        fecha=fecha_turno, usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
     enviar_email(admin.email, "Solicitud de turno",
-                 f"El usuario {usuario.nombre} ha solicitado un turno en el horario de {turno.horario} y motivo {turno.motivo}. Ante cualquier consulta, contactese con {usuario.email}")
+                 f"El usuario {usuario.nombre} ha solicitado un turno en el horario de {nuevo_turno.horario} y motivo {nuevo_turno.motivo}. Ante cualquier consulta, contactese con {usuario.email}")
     return jsonify({"message": "Turno agregado satisfactoriamente", "fecha_turno": fecha_turno})
 
 
@@ -89,7 +93,7 @@ def modificar_turno(id):
 
     fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
     if (datetime.now() < fecha_turno):
-        return jsonify({"error": "Fecha de vacunacion no puede ser mayor a la fecha actual"})
+        return jsonify({"error": "Fecha de turno no puede ser mayor a la fecha actual"})
 
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")

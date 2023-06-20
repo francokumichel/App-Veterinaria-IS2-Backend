@@ -12,10 +12,11 @@ class Turno(db.Model):
     mascota_id = db.Column(db.Integer, db.ForeignKey(
         'mascota.id'), nullable=False)
 
-    def __init__(self, horario, motivo, estado, usuario_id, mascota_id):
+    def __init__(self, horario, motivo, estado, fecha, usuario_id, mascota_id):
         self.horario = horario
         self.motivo = motivo
         self.estado = estado
+        self.fecha = fecha
         self.usuario_id = usuario_id
         self.mascota_id = mascota_id
 
