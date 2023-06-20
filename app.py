@@ -6,6 +6,7 @@ from routes.RAnuncio import anuncio
 from routes.RVacuna import vacuna
 from routes.RAdopcion import adopcion
 from routes.RCampania import campania
+from routes.RDonacion import donacion
 from utils.db import init_app
 from config import DATABASE_CONNECTION_URI
 from services.email_service import mail
@@ -33,5 +34,6 @@ app.register_blueprint(anuncio)
 app.register_blueprint(vacuna)
 app.register_blueprint(adopcion)
 app.register_blueprint(campania)
+app.register_blueprint(donacion)
 
 mail.init_app(app)  # Inicializo el servicio de email

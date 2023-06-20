@@ -9,10 +9,12 @@ campania = Blueprint('campania', __name__)
 def agregar_campania():
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
-   
-    # Validar los datos del formulario aquí si es necesario
 
-    nueva_campania = Campania(titulo=titulo, descripcion=descripcion)
+    campanias = Campania.query.all()
+    for campania in campanias:
+        campania.seleccionada = False
+
+    nueva_campania = Campania(titulo=titulo, descripcion=descripcion, seleccionada=True)
     db.session.add(nueva_campania)
     db.session.commit()
 
@@ -27,6 +29,7 @@ def obtener_campanias():
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
+            "seleccionada": campania.seleccionada 
         }
         for campania in campanias
     ]
@@ -39,6 +42,7 @@ def obtener_campania_by_id(id):
            "id": campania.id,
            "titulo": campania.titulo,
            "descripcion": campania.descripcion,
+           "seleccionada": campania.seleccionada 
         }
     return jsonify(campania_json)
 
@@ -86,6 +90,55 @@ def obtener_por_titulo(titulo):
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
+            "seleccionada": campania.seleccionada
+        }
+    ]
+
+    return jsonify(campania_json)
+
+@campania.route("/campania/seleccionarCampaña/<id>", methods=["GET"])
+def seleccionar_campania(id):
+
+    campanias = Campania.query.all()
+    for campania in campanias:
+        campania.seleccionada = False
+
+    campania = Campania.query.get(id)
+    if not campania:
+        return jsonify({"error": "Campaña no encontrada"}), 404
+
+    seleccionada = True
+
+    # Actualiza los campos de la campaña existente
+    campania.seleccionada = seleccionada
+
+    # Guarda los cambios en la base de datos
+    db.session.commit()
+
+    campania_json = [
+        {
+            "id": campania.id,
+            "titulo": campania.titulo,
+            "descripcion": campania.descripcion,
+            "seleccionada": campania.seleccionada 
+        }
+        for campania in campanias
+    ]
+    return jsonify(campania_json)
+
+@campania.route("/campania/getCampaniaSeleccionada", methods=["GET"])
+def obtener_campania_seleccionada():
+    campania = Campania.query.filter_by(seleccionada=True).first()
+
+    if not campania:
+        return jsonify({"error": "Campaña no encontrada"}), 404
+    
+    campania_json = [
+        {
+            "id": campania.id,
+            "titulo": campania.titulo,
+            "descripcion": campania.descripcion,
+            "seleccionada": campania.seleccionada
         }
     ]
 
