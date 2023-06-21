@@ -30,7 +30,7 @@ def agregar_turno():
 
     # Realizar las verificaciones aquí antes de crear el nuevo turno
     if "vacunación".lower() in motivo.lower():
-        if ha_pasado_1_año_desde_ultima_vacuna(mascota.nombre, motivo):
+        if ha_pasado_1_año_desde_ultima_vacuna(mascota, motivo):
             # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
             return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"}), 400
         elif es_menor_4_meses(mascota.fechaN):
@@ -61,7 +61,10 @@ def obtener_turnos():
             "id": turno.id,
             "horario": turno.horario,
             "motivo": turno.motivo,
-            "estado": turno.estado
+            "estado": turno.estado,
+            "fecha": turno.fecha,
+            "usuario_id": turno.usuario_id,
+            "mascota_id": turno.mascota_id
         }
         for turno in turnos
     ]
@@ -77,6 +80,7 @@ def obtener_turno_by_id(id):
         "horario": turno.horario,
         "motivo": turno.motivo,
         "estado": turno.estado,
+        "fecha": turno.fecha,
         "usuario_id": turno.usuario_id,
         "mascota_id": turno.mascota_id
     }
@@ -127,16 +131,16 @@ def eliminar_turno(id):
 
 @turno.route("/turno/cambiarEstado/<id>", methods=["PUT"])
 def cambiar_estado_turno(id):
-    estado_nuevo = request.json.get("estado")
-    email = request.json.get("email")
-
     turno = Turno.query.get(id)
+    estado_nuevo = request.json.get("estado")
+    email_emisor = request.json.get("email_emisor")
+
     if not turno:
         return jsonify({"error": "Turno no encontrado"})
 
     turno.estado = estado_nuevo
     db.session.commit()
-    enviar_email(email, f"Turno {estado_nuevo}",
-                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {email}")
+    enviar_email(email_emisor, f"Turno {estado_nuevo}",
+                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {email_emisor}")
 
     return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
