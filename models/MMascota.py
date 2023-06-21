@@ -14,7 +14,7 @@ class Mascota(db.Model):
     vacunas = db.relationship(
         'Vacuna', backref='mascota', lazy=True, cascade="all, delete-orphan")
     turnos = db.relationship('Turno', backref='mascota',
-                             lazy=True, cascade="all, delete-orphan")
+                             lazy=True)
     adopcion = db.relationship(
         "Adopcion", uselist=False, backref="mascota", cascade="all, delete-orphan")
     anonima = db.Column(db.Boolean, default=False)

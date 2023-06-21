@@ -44,7 +44,7 @@ def agregar_turno():
             # El animal es mayor a 4 meses, se programa el turno 1 año después
             fecha_turno = calcular_fecha_turno(365)
 
-    nuevo_turno = Turno(horario=horario, motivo=motivo, estado="pendiente",
+    nuevo_turno = Turno(horario=horario, motivo=motivo, estado="Pendiente",
                         fecha=fecha_turno, usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
@@ -59,11 +59,9 @@ def obtener_turnos():
     turnos_json = [
         {
             "id": turno.id,
-            "nombre_usuario": turno.usuario.nombre,
-            "apellido_usuario": turno.usuario.apellido,
-            "nombre_mascota": turno.mascota.nombre,
             "horario": turno.horario,
-            "motivo": turno.motivo
+            "motivo": turno.motivo,
+            "estado": turno.estado
         }
         for turno in turnos
     ]
@@ -78,6 +76,7 @@ def obtener_turno_by_id(id):
         "id": turno.id,
         "horario": turno.horario,
         "motivo": turno.motivo,
+        "estado": turno.estado,
         "usuario_id": turno.usuario_id,
         "mascota_id": turno.mascota_id
     }
@@ -126,14 +125,14 @@ def eliminar_turno(id):
     return jsonify({"message": "Turno eliminado satisfactoriamente"})
 
 
-@turno.route("/turno/cambiar_estado/<id>", methods=["PUT"])
+@turno.route("/turno/cambiarEstado/<id>", methods=["PUT"])
 def cambiar_estado_turno(id):
     estado_nuevo = request.json.get("estado")
     email = request.json.get("email")
 
     turno = Turno.query.get(id)
     if not turno:
-        return jsonify({"error": "Turno no encontrado"}), 404
+        return jsonify({"error": "Turno no encontrado"})
 
     turno.estado = estado_nuevo
     db.session.commit()

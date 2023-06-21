@@ -16,3 +16,11 @@ class Donacion(db.Model):
         self.DNI = DNI
         self.campania_id = campania_id
         
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "monto": self.monto,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "DNI": self.DNI
+        }

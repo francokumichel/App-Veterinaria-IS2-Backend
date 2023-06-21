@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from models.MDonacion import Donacion
+from models.MUsuario import Usuario
 from utils.db import db
 from datetime import datetime, timedelta
 
@@ -16,6 +17,10 @@ def agregar_donacion():
     nombre = request.json.get("nombre")
     apellido = request.json.get("apellido")
     DNI = request.json.get("DNI")
+    usuario = Usuario.query.filter_by(DNI=DNI).first()
+    if usuario:
+        usuario.montoDonado += monto*0.2
+
     campania_id = request.json.get("campania_id")
 
     nueva_donacion = Donacion(monto=monto, nombre=nombre, apellido=apellido, DNI=DNI, campania_id=campania_id)

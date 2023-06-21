@@ -10,12 +10,13 @@ class Usuario(db.Model):
     telefono = db.Column(db.String(100))
     password = db.Column(db.String(100))
     admin = db.Column(db.Boolean, default=False)
+    montoDonado = db.Column(db.REAL, default=0)
     mascotas = db.relationship(
         'Mascota', backref='usuario', lazy=True, cascade="all, delete-orphan")
     adopciones = db.relationship(
         'Adopcion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     turnos = db.relationship('Turno', backref='usuario',
-                             lazy=True, cascade="all, delete-orphan")
+                             lazy=True)
 
     def __init__(self, nombre, apellido, DNI, email, telefono, password, mascotas, admin):
         self.nombre = nombre

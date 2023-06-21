@@ -67,6 +67,7 @@ def obtener_usuario_by_id(id):
         "telefono": usuario.telefono,
         "password": usuario.password,
         "admin": usuario.admin,
+        "montoDonado": usuario.montoDonado,
         "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
     }
     return jsonify(usuario_json)
@@ -133,7 +134,13 @@ def modificar_usuario_reducido(id):
 def eliminar_usuario(id):
     usuario = Usuario.query.get(id)
     if not usuario:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify({"error": "Usuario no encontrado"})
+    
+    for turno in usuario.turnos:
+        if turno.estado == "Pendiente":
+            db.session.delete(turno)
+        elif turno.estado == "Aceptado":
+            turno.estado = "Finalizado"
 
     db.session.delete(usuario)
     db.session.commit()
@@ -158,6 +165,7 @@ def obtener_por_nombre(nombre):
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
+            "montoDonado": usuario.montoDonado,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
         }
     ]
@@ -182,6 +190,7 @@ def obtener_por_documento(DNI):
             "telefono": usuario.telefono,
             "password": usuario.password,
             "admin": usuario.admin,
+            "montoDonado": usuario.montoDonado,
             "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
         }
     ]
@@ -231,6 +240,7 @@ def main_usuario(email):
         "telefono": usuario.telefono,
         "password": usuario.password,
         "admin": usuario.admin,
+        "montoDonado": usuario.montoDonado,
         "mascotas": [mascota.to_dict() for mascota in usuario.mascotas if mascota.anonima == False]
     }
 

@@ -29,7 +29,8 @@ def obtener_campanias():
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
-            "seleccionada": campania.seleccionada 
+            "seleccionada": campania.seleccionada,
+            "donaciones":  [donacion.to_dict() for donacion in campania.donaciones]
         }
         for campania in campanias
     ]
@@ -42,7 +43,8 @@ def obtener_campania_by_id(id):
            "id": campania.id,
            "titulo": campania.titulo,
            "descripcion": campania.descripcion,
-           "seleccionada": campania.seleccionada 
+           "seleccionada": campania.seleccionada,
+           "donaciones":  [donacion.to_dict() for donacion in campania.donaciones]
         }
     return jsonify(campania_json)
 
@@ -90,7 +92,8 @@ def obtener_por_titulo(titulo):
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
-            "seleccionada": campania.seleccionada
+            "seleccionada": campania.seleccionada,
+            "donaciones":  [donacion.to_dict() for donacion in campania.donaciones]
         }
     ]
 
@@ -120,7 +123,8 @@ def seleccionar_campania(id):
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
-            "seleccionada": campania.seleccionada 
+            "seleccionada": campania.seleccionada,
+            "donaciones":  [donacion.to_dict() for donacion in campania.donaciones]
         }
         for campania in campanias
     ]
@@ -131,14 +135,15 @@ def obtener_campania_seleccionada():
     campania = Campania.query.filter_by(seleccionada=True).first()
 
     if not campania:
-        return jsonify({"error": "Campaña no encontrada"}), 404
+        return jsonify({"error": "Campaña no encontrada"})
     
     campania_json = [
         {
             "id": campania.id,
             "titulo": campania.titulo,
             "descripcion": campania.descripcion,
-            "seleccionada": campania.seleccionada
+            "seleccionada": campania.seleccionada,
+            "donaciones":  [donacion.to_dict() for donacion in campania.donaciones]
         }
     ]
 

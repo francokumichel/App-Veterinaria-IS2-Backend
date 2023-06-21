@@ -118,8 +118,14 @@ def modificar_usuario(id):
 def eliminar_usuario(id):
     mascota = Mascota.query.get(id)
     if not mascota:
-        return jsonify({"error": "Mascota no encontrado"}), 404
-
+        return jsonify({"error": "Mascota no encontrado"})
+    
+    for turno in mascota.turnos:
+        if turno.estado == "Pendiente":
+            db.session.delete(turno)
+        elif turno.estado == "Aceptado":
+            turno.estado = "Finalizado"
+            
     db.session.delete(mascota)
     db.session.commit()
 
