@@ -9,8 +9,7 @@ def calcular_fecha_turno(dias_adicionales):
 
 
 def es_menor_4_meses(fecha_nacimiento):
-    fecha_nacimiento = datetime.strptime(fecha_nacimiento, "%Y-%m-%d")
-    fecha_actual = datetime.strptime(datetime.now(), "%Y-%m-%d")
+    fecha_actual = datetime.now()
 
     dif_en_meses = abs((fecha_actual.year - fecha_nacimiento.year)
                        * 12 + (fecha_actual.month - fecha_nacimiento.month))
@@ -21,7 +20,7 @@ def es_menor_4_meses(fecha_nacimiento):
 def ha_pasado_1_año_desde_ultima_vacuna(mascota, nombre_vacuna):
     ultima_vacuna = Vacuna.ultima_vacuna(mascota, nombre_vacuna)
     if not ultima_vacuna:
-        return True
+        return False
 
     fecha_actual = datetime.now()
     fecha_ultima_vacuna = ultima_vacuna.fecha

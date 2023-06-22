@@ -32,11 +32,11 @@ def agregar_turno():
     if "vacunación".lower() in motivo.lower():
         if ha_pasado_1_año_desde_ultima_vacuna(mascota, motivo):
             # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
-            return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"}), 400
+            return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"})
         elif es_menor_4_meses(mascota.fechaN):
             if "antirrabica".lower() in motivo.lower():
                 # No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses
-                return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"}), 400
+                return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"})
             else:
                 # El animal es menor a 4 meses, se programa el turno 21 días después
                 fecha_turno = calcular_fecha_turno(21)
