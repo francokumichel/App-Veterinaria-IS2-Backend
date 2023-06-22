@@ -7,7 +7,7 @@ class Donacion(db.Model):
     apellido = db.Column(db.String(100))
     DNI = db.Column(db.String(100))
     campania_id = db.Column(db.Integer, db.ForeignKey(
-        'campania.id'), nullable=True)
+        'campania.id'))
 
     def __init__(self, monto, nombre, apellido, DNI, campania_id):
         self.monto = monto

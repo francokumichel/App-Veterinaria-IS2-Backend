@@ -8,9 +8,9 @@ class Turno(db.Model):
     estado = db.Column(db.String(100))
     fecha = db.Column(db.DateTime(timezone=False))
     usuario_id = db.Column(db.Integer, db.ForeignKey(
-        'usuario.id'), nullable=False)
+        'usuario.id'))
     mascota_id = db.Column(db.Integer, db.ForeignKey(
-        'mascota.id'), nullable=False)
+        'mascota.id'))
 
     def __init__(self, horario, motivo, estado, fecha, usuario_id, mascota_id):
         self.horario = horario
