@@ -22,8 +22,8 @@ def agregar_turno():
     admin = Usuario.query.filter_by(admin=True).first()
 
     fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
-    if (datetime.now() > fecha_turno):
-        return jsonify({"error": "Fecha de turno no puede ser mayor a la fecha actual"})
+    if (fecha_turno < datetime.now()):
+        return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
 
     if not mascota:
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
@@ -75,6 +75,7 @@ def obtener_turnos():
 @turno.route("/turno/getById/<id>", methods=["GET"])
 def obtener_turno_by_id(id):
     turno = Turno.query.filter_by(id=id).first()
+    mascota = Mascota.query.filter_by(id=turno.mascota_id).first()
     turno_json = {
         "id": turno.id,
         "horario": turno.horario,
@@ -82,7 +83,8 @@ def obtener_turno_by_id(id):
         "estado": turno.estado,
         "fecha": turno.fecha,
         "usuario_id": turno.usuario_id,
-        "mascota_id": turno.mascota_id
+        "mascota_id": turno.mascota_id,
+        "mascota": mascota.to_dict()
     }
 
     return jsonify(turno_json)
@@ -95,9 +97,9 @@ def modificar_turno(id):
         return jsonify({"error": "Turno no encontrado"}), 404
 
     fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
-    if (datetime.now() < fecha_turno):
-        return jsonify({"error": "Fecha de turno no puede ser mayor a la fecha actual"})
-
+    if (fecha_turno < datetime.now()):
+        return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
+    
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
