@@ -94,15 +94,12 @@ def obtener_turno_by_id(id):
 def modificar_turno(id):
     turno = Turno.query.get(id)
     if not turno:
-        return jsonify({"error": "Turno no encontrado"}), 404
-
-    fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
-    if (fecha_turno < datetime.now()):
-        return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
+        return jsonify({"error": "Turno no encontrado"})
 
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
+    usuario_id = request.json.get("usuario_id")
 
     # Actualizo los campos del turno existente
     turno.horario = horario
@@ -111,10 +108,18 @@ def modificar_turno(id):
     # Guardo los cambios en la base de datos
     db.session.commit()
 
-    usuario = Usuario.query.filter_by(id=turno.usuario_id).first()
-    enviar_email(usuario.email,
+    usuario = Usuario.query.filter_by(id=usuario_id).first()
+
+    if usuario.admin:
+        string_a_devolver = "administrador"
+        otro_usuario = Usuario.query.filter_by(id=turno.usuario_id).first()
+    else:
+        otro_usuario = Usuario.query.filter_by(admin=True).first()
+        string_a_devolver = f"usuario {otro_usuario.nombre}"
+
+    enviar_email(otro_usuario.email,
                  "Modificación de turno",
-                 f"Su turno ha sido modificado por el siguiente horario y motivo: /n Horario: {turno.horario} /n {turno.motivo}")
+                 f"El {string_a_devolver} ha modificado el turno. El nuevo horario y motivo son: \nHorario: {turno.horario} \nMotivo: {turno.motivo}")
 
     return jsonify({"message": "Turno actualizado satisfactoriamente"})
 
@@ -123,7 +128,7 @@ def modificar_turno(id):
 def eliminar_turno(id):
     turno = Turno.query.get(id)
     if not turno:
-        return jsonify({"error": "Turno no encontrado"}), 404
+        return jsonify({"error": "Turno no encontrado"})
 
     db.session.delete(turno)
     db.session.commit()
