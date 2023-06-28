@@ -20,9 +20,3 @@ class Vacuna(db.Model):
             "fecha": self.fecha,
             "mascota_id": self.mascota_id
         }
-
-    @staticmethod
-    def ultima_vacuna(mascota, nombre_vacuna):
-        ultima_vacuna = Vacuna.query.filter_by(
-            mascota_id=mascota.id, nombre=nombre_vacuna).order_by(Vacuna.fecha.desc()).first()
-        return ultima_vacuna

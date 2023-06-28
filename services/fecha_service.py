@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from models.MVacuna import Vacuna
 
 
 def calcular_fecha_turno(dias_adicionales):
@@ -18,10 +17,17 @@ def es_menor_4_meses(fecha_nacimiento):
 
 
 def ha_pasado_1_año_desde_ultima_vacuna(mascota, nombre_vacuna):
-    ultima_vacuna = Vacuna.ultima_vacuna(mascota, nombre_vacuna)
-    if not ultima_vacuna:
-        return False
+    # Si no tiene vacunas, devuelvo true
+    if not mascota.vacunas:
+        return True
 
+    vacunas_ordenadas = sorted((vacuna for vacuna in mascota.vacunas if vacuna.nombre.lower() ==
+                               nombre_vacuna.lower()), key=lambda vacuna: vacuna.fecha, reverse=True)
+    # Verifico si existen vacunas con el nombre pasado por parámetro
+    if not vacunas_ordenadas:
+        return True
+
+    ultima_vacuna = vacunas_ordenadas[0]
     fecha_actual = datetime.now()
     fecha_ultima_vacuna = ultima_vacuna.fecha
     diferencia = fecha_actual - fecha_ultima_vacuna

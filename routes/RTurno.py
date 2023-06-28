@@ -30,11 +30,11 @@ def agregar_turno():
 
     # Realizar las verificaciones aquí antes de crear el nuevo turno
     if "vacunación".lower() in motivo.lower():
-        if ha_pasado_1_año_desde_ultima_vacuna(mascota, motivo):
+        if not ha_pasado_1_año_desde_ultima_vacuna(mascota, motivo):
             # No se puede solicitar turno si no ha pasado 1 año desde la última vacuna
             return jsonify({"error": "No se puede solicitar turno, no ha pasado 1 año desde la última vacuna"})
         elif es_menor_4_meses(mascota.fechaN):
-            if "antirrabica".lower() in motivo.lower():
+            if "antirrábica".lower() in motivo.lower():
                 # No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses
                 return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"})
             else:
@@ -99,7 +99,7 @@ def modificar_turno(id):
     fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
     if (fecha_turno < datetime.now()):
         return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
-    
+
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
     motivo = request.json.get("motivo")
