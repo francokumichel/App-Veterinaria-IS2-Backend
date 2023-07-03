@@ -89,6 +89,11 @@ def modificar_usuario(id):
     fecha_nacimiento = datetime.strptime(request.json.get("fechaN"), "%Y-%m-%d")
     if (datetime.now() < fecha_nacimiento):
         return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
+    
+    #Chequear que no exista otra mascota con el mismo nombre
+    mascota = Mascota.query.filter_by(nombre=request.json.get("nombre")).first()
+    if mascota:
+        return jsonify({"error": "Ya existe una mascota con ese nombre. Por favor cambialo." })
 
     # Obtén los nuevos datos del formulario o solicitud
     nombre = request.json.get("nombre")
