@@ -98,12 +98,11 @@ def modificar_turno(id):
 
     # Obtengo los nuevos datos del formulario o solicitud
     horario = request.json.get("horario")
-    motivo = request.json.get("motivo")
     usuario_id = request.json.get("usuario_id")
 
     # Actualizo los campos del turno existente
     turno.horario = horario
-    turno.motivo = motivo
+    turno.estado = "Modificado"
 
     # Guardo los cambios en la base de datos
     db.session.commit()
@@ -119,7 +118,7 @@ def modificar_turno(id):
 
     enviar_email(otro_usuario.email,
                  "Modificación de turno",
-                 f"El {string_a_devolver} ha modificado el turno. El nuevo horario y motivo son: \nHorario: {turno.horario} \nMotivo: {turno.motivo}")
+                 f"El {string_a_devolver} ha modificado el turno. El nuevo horario es {turno.horario}")
 
     return jsonify({"message": "Turno actualizado satisfactoriamente"})
 
@@ -140,14 +139,21 @@ def eliminar_turno(id):
 def cambiar_estado_turno(id):
     turno = Turno.query.get(id)
     estado_nuevo = request.json.get("estado")
-    email_emisor = request.json.get("email_emisor")
+    usuario_actual = request.json.get("usuario_actual")
 
     if not turno:
         return jsonify({"error": "Turno no encontrado"})
-
+    
     turno.estado = estado_nuevo
+
+    if usuario_actual['admin']:
+        usuario_remitente = Usuario.query.filter_by(id=turno.usuario_id).first()
+    else:
+        usuario_remitente = Usuario.query.filter_by(admin=True).first()   
+
+
     db.session.commit()
-    enviar_email(email_emisor, f"Turno {estado_nuevo}",
-                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {email_emisor}")
+    enviar_email(usuario_remitente.email, f"Turno {estado_nuevo}",
+                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {usuario_actual.email}")
 
     return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
