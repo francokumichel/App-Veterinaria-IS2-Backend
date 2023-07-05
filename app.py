@@ -3,6 +3,7 @@ from routes.RTurno import turno
 from routes.RUsuario import usuario
 from routes.RMascota import mascota
 from routes.RAnuncio import anuncio
+from routes.RPerdido import perdido
 from routes.RVacuna import vacuna
 from routes.RAdopcion import adopcion
 from routes.RCampania import campania
@@ -31,6 +32,7 @@ init_app(app)
 app.register_blueprint(turno)
 app.register_blueprint(mascota)
 app.register_blueprint(usuario)
+app.register_blueprint(perdido)
 app.register_blueprint(anuncio)
 app.register_blueprint(vacuna)
 app.register_blueprint(adopcion)
