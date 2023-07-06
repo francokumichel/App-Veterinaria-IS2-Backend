@@ -157,3 +157,32 @@ def cambiar_estado_turno(id):
                  f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {usuario_actual.email}")
 
     return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
+
+@turno.route("/turno/obtenerMontoDescuentoUsuario/<id>", methods=["GET"])
+def obtener_monto_a_descontar(id):
+    turno = Turno.query.get(id)
+
+    usuario = Usuario.query.filter_by(id = turno.usuario_id).first()
+
+    return jsonify({'monto_a_descontar': usuario.montoDonado})
+
+
+
+@turno.route("/turno/confirmarAsistencia/<id>", methods=["PUT"])
+def confirmar_asistencia(id):
+    estado_nuevo = request.json.get("estado")
+    turno = Turno.query.get(id)
+    turno.estado = estado_nuevo
+
+    if estado_nuevo == "Asistió":        
+        usuario = Usuario.query.filter_by(id = turno.usuario_id).first()
+        
+        # Reinicio el contador del monto para descuentos
+        usuario.montoDonado = 0
+
+        # Registro en la libreta de la mascota la vacuna
+
+        return jsonify({"message": "Se ha confirmado con éxito la asistencia al turno por parte del usuario"})
+    
+    return jsonify({"message": "Se ha confirmado con éxito la no asistencia al turno por parte del usuario"})
+    
