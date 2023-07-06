@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from models.MTurno import Turno
 from models.MMascota import Mascota
 from models.MUsuario import Usuario
+from models.MVacuna import Vacuna
 from utils.db import db
 from services.email_service import enviar_email
 from services.fecha_service import calcular_fecha_turno, es_menor_4_meses, ha_pasado_1_año_desde_ultima_vacuna
@@ -154,7 +155,7 @@ def cambiar_estado_turno(id):
 
     db.session.commit()
     enviar_email(usuario_remitente.email, f"Turno {estado_nuevo}",
-                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {usuario_actual.email}")
+                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {usuario_actual['email']}")
 
     return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
 
@@ -171,18 +172,26 @@ def obtener_monto_a_descontar(id):
 @turno.route("/turno/confirmarAsistencia/<id>", methods=["PUT"])
 def confirmar_asistencia(id):
     estado_nuevo = request.json.get("estado")
+    print(estado_nuevo)
     turno = Turno.query.get(id)
     turno.estado = estado_nuevo
 
-    if estado_nuevo == "Asistió":        
-        usuario = Usuario.query.filter_by(id = turno.usuario_id).first()
-        
-        # Reinicio el contador del monto para descuentos
-        usuario.montoDonado = 0
-
-        # Registro en la libreta de la mascota la vacuna
-
-        return jsonify({"message": "Se ha confirmado con éxito la asistencia al turno por parte del usuario"})
+    if (estado_nuevo == "Asistió") & ("vacunación".lower() in turno.motivo.lower()):
+        print("creando vacuna...")        
+        nueva_vacuna = Vacuna(nombre=turno.motivo, fecha=turno.fecha, mascota_id=turno.mascota_id)
+        db.session.add(nueva_vacuna)    
+    elif estado_nuevo == "No asistió":
+        return jsonify({"message": "Se ha confirmado con éxito la no asistencia al turno por parte del usuario"})
     
-    return jsonify({"message": "Se ha confirmado con éxito la no asistencia al turno por parte del usuario"})
+    db.session.commit()
+    return jsonify({"message": "Se ha confirmado con éxito la asistencia al turno por parte del usuario"})
     
+    
+
+@turno.route("/turno/confirmarPago/<id>", methods=["PUT"])
+def confirmar_pago(id):
+    turno = Turno.query.get(id)
+    usuario = Usuario.query.filter_by(id=turno.usuario_id).first()
+    usuario.montoDonado = 0
+    db.session.commit()
+    return jsonify({"message": "El pago se ha realizado exitosamente"})
