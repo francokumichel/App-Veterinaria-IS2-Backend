@@ -1,6 +1,6 @@
 from utils.db import db
 
-class Coordenada(db.Model):
+class Veterinaria(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     coordenadaX = db.Column(db.REAL)
     coordenadaY = db.Column(db.REAL)
