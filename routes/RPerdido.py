@@ -2,24 +2,37 @@ from flask import Blueprint, jsonify, request
 from models.MPerdido import Perdido
 from utils.db import db
 from services.email_service import enviar_email
+import base64
 
 perdido = Blueprint('perdido', __name__)
 
 
 @perdido.route("/perdido/add", methods=["POST"])
 def agregar_perdido():
+    transfer_encoding = request.headers.get("Transfer-Encoding", None)
+    if transfer_encoding == u"chunked":
+        request.environ["wsgi.input_terminated"] = True
+
+    perdidos = Perdido.query.all()
+    for perdido in perdidos:
+        if perdido.nombre == request.json.get("nombre") and perdido.usuario_id == request.json.get("usuario_id"):
+            return jsonify({"error": "Ya existe un anuncio de perro perdido con esa mascota"})
+    
+    usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     email = request.json.get("email")
-
+    tipo = request.json.get("imagen").get("tipo")
+    nombreImg = request.json.get("imagen").get("nombre")
+    base64 = request.json.get("imagen").get("base64")
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_perdido = Perdido(nombre=nombre, titulo=titulo, descripcion=descripcion, email=email)
+    nuevo_perdido = Perdido(nombre=nombre, titulo=titulo, descripcion=descripcion, email=email, tipo=tipo, nombreImg=nombreImg, base64=base64, usuario_id=usuario_id, encontrado=False)
     db.session.add(nuevo_perdido)
     db.session.commit()
 
-    return "Anuncio de perro perdido agregado satisfactoriamente"
+    return jsonify({"message":"Anuncio de perro perdido agregado satisfactoriamente"})
 
 
 @perdido.route("/perdido/get", methods=["GET"])
@@ -28,10 +41,17 @@ def obtener_perdidos():
     perdido_json = [
         {
             "id": perdido.id,
+            "encontrado": perdido.encontrado,
+            "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,
+            "imagen": {
+                "tipo": perdido.tipo,
+                "nombre": perdido.nombreImg,
+                "base64": base64.b64encode(perdido.base64).decode("utf-8", "ignore")
+            }
         }
         for perdido in perdidos
     ]
@@ -42,31 +62,52 @@ def obtener_perdido_by_id(id):
     perdido = Perdido.query.filter_by(id=id).first()
     perdido_json = {
             "id": perdido.id,
+            "encontrado": perdido.encontrado,
+            "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,
+            "imagen": {
+                "tipo": perdido.tipo,
+                "nombre": perdido.nombreImg,
+                "base64": base64.b64encode(perdido.base64).decode("ascii", "ignore")
+            }
         }
     return jsonify(perdido_json)
 
 
 @perdido.route("/perdido/put/<id>", methods=["PUT"])
 def modificar_perdido(id):
+    transfer_encoding = request.headers.get("Transfer-Encoding", None)
+    if transfer_encoding == u"chunked":
+        request.environ["wsgi.input_terminated"] = True
+
     perdido = Perdido.query.get(id)
     if not perdido:
-        return jsonify({"error": "Anuncio de perro perdido no encontrado"}), 404
+        return jsonify({"error": "Anuncio de perro perdido no encontrado"})
 
     # Obtén los nuevos datos del formulario o solicitud
+    usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     email = request.json.get("email")
+    tipo = request.json.get("imagen").get("tipo")
+    nombreImg = request.json.get("imagen").get("nombre")
+    base64 = request.json.get("imagen").get("base64")
+    encontrado = request.json.get("encontrado")
 
     # Actualiza los campos del anuncio existente
+    perdido.usuario_id = usuario_id
     perdido.nombre = nombre
     perdido.titulo = titulo
     perdido.descripcion = descripcion
     perdido.email = email
+    perdido.tipo = tipo
+    perdido.nombreImg = nombreImg
+    perdido.base64 = base64
+    perdido.encontrado = encontrado
 
     # Guarda los cambios en la base de datos
     db.session.commit()
@@ -77,7 +118,7 @@ def modificar_perdido(id):
 def modificar_perdido_reducido(id):
     perdido = Perdido.query.get(id)
     if not perdido:
-        return jsonify({"error": "Anuncio de perro perdido no encontrado"}), 404
+        return jsonify({"error": "Anuncio de perro perdido no encontrado"})
 
     email = request.json.get("email")
 
@@ -94,7 +135,7 @@ def modificar_perdido_reducido(id):
 def eliminar_perdido(id):
     perdido = Perdido.query.get(id)
     if not perdido:
-        return jsonify({"error": "Anuncio de perro perdido no encontrado"}), 404
+        return jsonify({"error": "Anuncio de perro perdido no encontrado"})
 
     db.session.delete(perdido)
     db.session.commit()
@@ -106,15 +147,22 @@ def obtener_por_nombre(nombre):
     perdido = perdido.query.filter_by(nombre=nombre).first()
 
     if not perdido:
-        return jsonify({"error": "Anuncio de perro perdido no encontrado"}), 404
+        return jsonify({"error": "Anuncio de perro perdido no encontrado"})
     
     perdido_json = [
         {
             "id": perdido.id,
+            "encontrado": perdido.encontrado,
+            "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,
+            "imagen": {
+                "tipo": perdido.tipo,
+                "nombre": perdido.nombreImg,
+                "base64": base64.b64encode(perdido.base64).decode("ascii", "ignore")
+            }
         }
     ]
 

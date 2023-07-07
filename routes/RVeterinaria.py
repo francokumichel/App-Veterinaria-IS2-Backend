@@ -17,7 +17,7 @@ def agregar_veterinaria():
     db.session.add(nueva_veterinaria)
     db.session.commit()
 
-    return jsonify("Veterinaria agregada satisfactoriamente")
+    return jsonify({"message": "Veterinaria agregada satisfactoriamente"})
 
 
 @veterinaria.route("/veterinaria/get", methods=["GET"])

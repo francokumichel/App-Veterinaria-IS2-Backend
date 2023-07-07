@@ -18,7 +18,7 @@ def agregar_campania():
     db.session.add(nueva_campania)
     db.session.commit()
 
-    return "Campaña agregada satisfactoriamente"
+    return jsonify({"message":"Campaña agregada satisfactoriamente"})
 
 
 @campania.route("/campania/get", methods=["GET"])

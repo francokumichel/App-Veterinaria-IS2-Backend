@@ -229,7 +229,7 @@ def main_usuario(email):
     usuario = Usuario.query.filter_by(email=email).first()
 
     if not usuario:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+        return jsonify({"error": "Usuario no encontrado"})
 
     usuario_json = {
         "id": usuario.id,
