@@ -20,6 +20,10 @@ def agregar_perdido():
     
     usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")
+    raza = request.json.get("raza")
+    color = request.json.get("color")
+    tamano = request.json.get("tamano")
+    sexo = request.json.get("sexo")
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     email = request.json.get("email")
@@ -28,7 +32,7 @@ def agregar_perdido():
     base64 = request.json.get("imagen").get("base64")
     # Validar los datos del formulario aquí si es necesario
 
-    nuevo_perdido = Perdido(nombre=nombre, titulo=titulo, descripcion=descripcion, email=email, tipo=tipo, nombreImg=nombreImg, base64=base64, usuario_id=usuario_id, encontrado=False)
+    nuevo_perdido = Perdido(nombre=nombre, raza=raza, color=color, tamano=tamano, sexo=sexo, titulo=titulo, descripcion=descripcion, email=email, tipo=tipo, nombreImg=nombreImg, base64=base64, usuario_id=usuario_id, encontrado=False)
     db.session.add(nuevo_perdido)
     db.session.commit()
 
@@ -44,6 +48,10 @@ def obtener_perdidos():
             "encontrado": perdido.encontrado,
             "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
+            "raza": perdido.raza,
+            "color": perdido.color,
+            "tamano": perdido.tamano,
+            "sexo": perdido.sexo,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,
@@ -65,6 +73,10 @@ def obtener_perdido_by_id(id):
             "encontrado": perdido.encontrado,
             "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
+            "raza": perdido.raza,
+            "color": perdido.color,
+            "tamano":perdido.tamano,
+            "sexo": perdido.sexo,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,
@@ -90,6 +102,10 @@ def modificar_perdido(id):
     # Obtén los nuevos datos del formulario o solicitud
     usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")
+    raza = request.json.get("raza")
+    color = request.json.get("color")
+    tamano = request.json.get("tamano")
+    sexo = request.json.get("sexo")
     titulo = request.json.get("titulo")
     descripcion = request.json.get("descripcion")
     email = request.json.get("email")
@@ -101,6 +117,10 @@ def modificar_perdido(id):
     # Actualiza los campos del anuncio existente
     perdido.usuario_id = usuario_id
     perdido.nombre = nombre
+    perdido.raza = raza
+    perdido.color = color
+    perdido.tamano = tamano
+    perdido.sexo = sexo
     perdido.titulo = titulo
     perdido.descripcion = descripcion
     perdido.email = email
@@ -155,6 +175,10 @@ def obtener_por_nombre(nombre):
             "encontrado": perdido.encontrado,
             "usuario_id": perdido.usuario_id,
             "nombre": perdido.nombre,
+            "raza": perdido.raza,
+            "color": perdido.color,
+            "tamano":perdido.tamano,
+            "sexo": perdido.sexo,
             "titulo": perdido.titulo,
             "descripcion": perdido.descripcion,
             "email": perdido.email,

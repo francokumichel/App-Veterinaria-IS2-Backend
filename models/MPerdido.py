@@ -5,6 +5,10 @@ class Perdido(db.Model):
     usuario_id = db.Column(db.Integer)
     encontrado = db.Column(db.Boolean, default=False)
     nombre = db.Column(db.String(100))
+    raza = db.Column(db.String(100))
+    color = db.Column(db.String(100))
+    tamano = db.Column(db.String(100))
+    sexo = db.Column(db.String(100))
     titulo = db.Column(db.String(100))
     descripcion = db.Column(db.String(100))
     email = db.Column(db.String(100))
@@ -12,8 +16,12 @@ class Perdido(db.Model):
     nombreImg = db.Column(db.String(100))
     base64 = db.Column(db.LargeBinary(length=(2**32)-1))
 
-    def __init__(self, nombre, titulo, descripcion, email, tipo, nombreImg, base64, usuario_id, encontrado=False):
+    def __init__(self, nombre, raza, color, tamano, sexo, titulo, descripcion, email, tipo, nombreImg, base64, usuario_id, encontrado=False):
         self.nombre = nombre
+        self.raza = raza
+        self.color = color
+        self.tamano = tamano
+        self.sexo = sexo
         self.titulo = titulo
         self.email = email
         self.descripcion = descripcion
