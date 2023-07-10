@@ -5,6 +5,7 @@ from models.MUsuario import Usuario
 from models.MCruza import Cruza
 from utils.db import db
 from services.email_service import enviar_email
+from services.fecha_service import es_menor_1_anio
 
 cruza = Blueprint('cruza', __name__)
 
@@ -17,6 +18,10 @@ def agregar_cruza():
     fecha_celo = request.json.get("fechaCelo")
     mascota_id = request.json.get("mascota_id")
     usuario_id = request.json.get("usuario_id")
+
+    mascota = Mascota.query.filter_by(id=mascota_id).first()
+    if es_menor_1_anio(mascota.fechaN):
+        return jsonify({"error": "La mascota debe tener más de 1 año para poder registrarla para cruza"})
 
     nueva_cruza = Cruza(fechaCelo=fecha_celo, mascota_id=mascota_id, usuario_id=usuario_id)
     db.session.add(nueva_cruza)
@@ -86,6 +91,6 @@ def mandar_mails():
     email = request.json.get("email")
     usuario_id = request.json.get("usuario_id")
     usuario = Usuario.query.filter_by(id=usuario_id).first()
-    enviar_email(usuario.email, "Adopcion", "Se ha registrado un interesado para cruza con su mascota. Su email es: " + email + ". Contactese con el para mas informacion.")
-    message = enviar_email(email, "Adopcion", "Tu solicitud de cruza ha sido exitosa, el usuario con el que quieres comunicarte tiene email: " + usuario.email + ". Contactese con el para mas informacion.")
+    enviar_email(usuario.email, "Cruza", "Se ha registrado un interesado para cruza con su mascota. Su email es: " + email + ". Contactese con el para mas informacion.")
+    message = enviar_email(email, "Cruza", "Tu solicitud de cruza ha sido exitosa, el usuario con el que quieres comunicarte tiene email: " + usuario.email + ". Contactese con el para mas informacion.")
     return jsonify({"message": message})

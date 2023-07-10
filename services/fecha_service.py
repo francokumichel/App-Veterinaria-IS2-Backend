@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from datetime import date
 
 
 def calcular_fecha_turno(dias_adicionales):
@@ -15,6 +16,8 @@ def es_menor_4_meses(fecha_nacimiento):
 
     return dif_en_meses <= 4
 
+def es_menor_1_anio(fecha_nacimiento):
+    return (date.today() - fecha_nacimiento).days < 365
 
 def ha_pasado_1_año_desde_ultima_vacuna(mascota, nombre_vacuna):
     # Si no tiene vacunas, devuelvo true
