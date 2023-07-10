@@ -17,6 +17,9 @@ class Usuario(db.Model):
         'Adopcion', backref='usuario', lazy=True, cascade="all, delete-orphan")
     turnos = db.relationship('Turno', backref='usuario',
                              lazy=True)
+    
+    cruzas = db.relationship(
+        'Cruza', backref='usuario', lazy=True, cascade="all, delete-orphan")
 
     def __init__(self, nombre, apellido, DNI, email, telefono, password, mascotas, admin):
         self.nombre = nombre

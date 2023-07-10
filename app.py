@@ -8,6 +8,7 @@ from routes.RVacuna import vacuna
 from routes.RAdopcion import adopcion
 from routes.RCampania import campania
 from routes.RDonacion import donacion
+from routes.RCruza import cruza
 from routes.RVeterinaria import veterinaria
 from utils.db import init_app
 from config import DATABASE_CONNECTION_URI
@@ -38,6 +39,7 @@ app.register_blueprint(vacuna)
 app.register_blueprint(adopcion)
 app.register_blueprint(campania)
 app.register_blueprint(donacion)
+app.register_blueprint(cruza)
 app.register_blueprint(veterinaria)
 
 mail.init_app(app)  # Inicializo el servicio de email
