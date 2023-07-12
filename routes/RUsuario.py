@@ -140,7 +140,7 @@ def eliminar_usuario(id):
         if turno.estado == "Pendiente":
             db.session.delete(turno)
         elif turno.estado == "Aceptado":
-            turno.estado = "Finalizado"
+            turno.estado = "Cancelado"
 
     db.session.delete(usuario)
     db.session.commit()
