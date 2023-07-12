@@ -91,8 +91,8 @@ def modificar_usuario(id):
         return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
     
     #Chequear que no exista otra mascota con el mismo nombre
-    mascota = Mascota.query.filter_by(nombre=request.json.get("nombre")).first()
-    if mascota:
+    mascotaChequeo = Mascota.query.filter(Mascota.nombre==request.json.get("nombre"), Mascota.id!=request.json.get("id")).first()
+    if mascotaChequeo:
         return jsonify({"error": "Ya existe una mascota con ese nombre. Por favor cambialo." })
 
     # Obtén los nuevos datos del formulario o solicitud
