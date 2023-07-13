@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, request
 from models.MPerdido import Perdido
 from utils.db import db
 from services.email_service import enviar_email
+from datetime import datetime, timedelta
 import base64
 
 perdido = Blueprint('perdido', __name__)
@@ -15,8 +16,13 @@ def agregar_perdido():
 
     perdidos = Perdido.query.all()
     for perdido in perdidos:
-        if perdido.nombre == request.json.get("nombre") and perdido.usuario_id == request.json.get("usuario_id"):
-            return jsonify({"error": "Ya existe un anuncio de perro perdido con esa mascota"})
+        if perdido.nombre == request.json.get("nombre") and perdido.usuario_id == request.json.get("usuario_id") and perdido.encontrado == False:
+            return jsonify({"error": "Ya existe un anuncio activo de perro perdido con esa mascota"})
+        
+    if request.json.get("fechaN"):
+        fecha_nacimiento = datetime.strptime(request.json.get("fechaN"), "%Y-%m-%d")
+        if (datetime.now() < fecha_nacimiento):
+            return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
     
     usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")

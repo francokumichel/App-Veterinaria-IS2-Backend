@@ -66,7 +66,7 @@ def obtener_turnos():
             "estado": turno.estado,
             "fecha": turno.fecha,
             "usuario_id": turno.usuario_id,
-            "mascota_id": turno.mascota_id
+            "mascota_id": turno.mascota_id,
         }
         for turno in turnos
     ]
@@ -176,12 +176,15 @@ def confirmar_asistencia(id):
     print(estado_nuevo)
     turno = Turno.query.get(id)
     turno.estado = estado_nuevo
-
+    if (turno.fecha > datetime.now()):
+        return jsonify({"error": "Para confirmar la asistencia/no asistencia el dia actual debe ser mayor o igual a la fecha del turno"})
+        
     if (estado_nuevo == "Asistió") & ("vacunación".lower() in turno.motivo.lower()):
-        print("creando vacuna...")        
+        print("creando vacuna...", turno.mascota_id)        
         nueva_vacuna = Vacuna(nombre=turno.motivo, fecha=turno.fecha, mascota_id=turno.mascota_id)
         db.session.add(nueva_vacuna)    
     elif estado_nuevo == "No asistió":
+        db.session.commit()
         return jsonify({"message": "Se ha confirmado con éxito la no asistencia al turno por parte del usuario"})
     
     db.session.commit()

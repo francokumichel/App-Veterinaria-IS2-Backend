@@ -30,3 +30,10 @@ class Usuario(db.Model):
         self.password = password
         self.mascotas = mascotas
         self.admin = admin
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "nombre": self.nombre,
+            "apellido": self.apellido
+        }

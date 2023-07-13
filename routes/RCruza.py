@@ -6,6 +6,7 @@ from models.MCruza import Cruza
 from utils.db import db
 from services.email_service import enviar_email
 from services.fecha_service import es_menor_1_anio
+from datetime import datetime
 
 cruza = Blueprint('cruza', __name__)
 
@@ -18,6 +19,11 @@ def agregar_cruza():
     fecha_celo = request.json.get("fechaCelo")
     mascota_id = request.json.get("mascota_id")
     usuario_id = request.json.get("usuario_id")
+    fecha_celo_prueba = datetime.strptime(fecha_celo, "%Y-%m-%d")
+
+    if (fecha_celo_prueba < datetime.now()):
+        return jsonify({"error": "La fecha de celo no puede ser menor a la fecha actual"})
+    
 
     mascota = Mascota.query.filter_by(id=mascota_id).first()
     if es_menor_1_anio(mascota.fechaN):
