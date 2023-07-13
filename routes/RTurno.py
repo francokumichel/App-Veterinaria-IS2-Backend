@@ -22,9 +22,10 @@ def agregar_turno():
     usuario = Usuario.query.get(usuario_id)
     admin = Usuario.query.filter_by(admin=True).first()
 
-    fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
-    if (fecha_turno < datetime.now()):
-        return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
+    if(request.json.get('fecha')):
+        fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
+        if (fecha_turno < datetime.now()):
+            return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
 
     if not mascota:
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
