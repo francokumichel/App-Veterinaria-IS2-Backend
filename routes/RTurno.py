@@ -184,7 +184,8 @@ def confirmar_asistencia(id):
         return jsonify({"message": "Se ha confirmado con éxito la no asistencia al turno por parte del usuario"})
     
     db.session.commit()
-    return jsonify({"message": "Se ha confirmado con éxito la asistencia al turno por parte del usuario"})
+    message = "Se ha confirmado con éxito la asistencia al turno por parte del usuario."
+    return jsonify({"message": message if "vacunación".lower() in turno.motivo.lower() else message + " Se ha actualizado la libreta de su mascota"})
     
     
 
