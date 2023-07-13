@@ -18,11 +18,6 @@ def agregar_perdido():
     for perdido in perdidos:
         if perdido.nombre == request.json.get("nombre") and perdido.usuario_id == request.json.get("usuario_id") and perdido.encontrado == False:
             return jsonify({"error": "Ya existe un anuncio activo de perro perdido con esa mascota"})
-        
-    if request.json.get("fechaN"):
-        fecha_nacimiento = datetime.strptime(request.json.get("fechaN"), "%Y-%m-%d")
-        if (datetime.now() < fecha_nacimiento):
-            return jsonify({"error": "Fecha de nacimiento no puede ser mayor a la fecha actual" })
     
     usuario_id = request.json.get("usuario_id")
     nombre = request.json.get("nombre")
