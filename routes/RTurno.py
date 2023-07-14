@@ -41,10 +41,10 @@ def agregar_turno():
                 return jsonify({"error": "No se puede solicitar turno de vacunación antirrábica para un animal menor a 4 meses"})
             else:
                 # El animal es menor a 4 meses, se programa el turno 21 días después
-                fecha_turno = calcular_fecha_turno(21)
+                fecha_turno = calcular_fecha_turno(22)
         else:
             # El animal es mayor a 4 meses, se programa el turno 1 año después
-            fecha_turno = calcular_fecha_turno(365)
+            fecha_turno = calcular_fecha_turno(366)
 
     nuevo_turno = Turno(horario=horario, motivo=motivo, estado="Pendiente",
                         fecha=fecha_turno, usuario_id=usuario_id, mascota_id=mascota_id)
