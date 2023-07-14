@@ -191,7 +191,7 @@ def confirmar_asistencia(id):
     message = "Se ha confirmado con éxito la asistencia al turno por parte del usuario."
     return jsonify({"message": message if not "vacunación".lower() in turno.motivo.lower() else message + " Se ha actualizado la libreta de su mascota"})
     
-    
+#Hola
 
 @turno.route("/turno/confirmarPago/<id>", methods=["PUT"])
 def confirmar_pago(id):
