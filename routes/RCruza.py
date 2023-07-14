@@ -77,6 +77,12 @@ def modificar_cruza(id):
         return jsonify({"error": "Cruza no encontrada"})
 
     fecha_celo = request.json.get("fechaCelo")
+
+    fecha_celo_prueba = datetime.strptime(fecha_celo, "%Y-%m-%d")
+
+    if (fecha_celo_prueba < datetime.now()):
+        return jsonify({"error": "La fecha de celo no puede ser menor a la fecha actual"})
+    
     cruza.fechaCelo = fecha_celo
 
     db.session.commit()
