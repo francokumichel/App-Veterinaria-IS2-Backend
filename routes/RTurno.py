@@ -17,6 +17,9 @@ def agregar_turno():
     motivo = request.json.get("motivo")
     usuario_id = request.json.get("usuario_id")
     mascota_id = request.json.get("mascota_id")
+    nomUsuario = request.json.get("nomUsuario")
+    nomMascota = request.json.get("nomMascota")
+    dniUser = request.json.get("dniUser")
 
     mascota = Mascota.query.get(mascota_id)
     usuario = Usuario.query.get(usuario_id)
@@ -25,7 +28,16 @@ def agregar_turno():
     if(request.json.get('fecha')):
         fecha_turno = datetime.strptime(request.json.get("fecha"), "%Y-%m-%d")
         if (fecha_turno < datetime.now()):
-            return jsonify({"error": "Fecha de turno no puede ser menor a la fecha actual"})
+            return jsonify({"error": "Fecha de turno no puede ser menor o igual a la fecha actual"})
+        
+    turnos = Turno.query.filter_by(mascota_id=mascota_id).all()
+    for turno in turnos:
+        if turno.motivo == motivo and turno.estado == "Pendiente":
+            return jsonify({"error": "Ya existe un turno pendiente para la mascota con el mismo motivo"})
+        if turno.motivo == motivo and turno.estado == "Aceptado":
+            return jsonify({"error": "Ya existe un turno Aceptado para la mascota con el mismo motivo"})
+        if turno.motivo == motivo and turno.estado == "Modificado":
+            return jsonify({"error": "Ya existe un turno Aceptado para la mascota con el mismo motivo"})
 
     if not mascota:
         return jsonify({"error": "No se encontró la mascota asociada"}), 404
@@ -46,7 +58,7 @@ def agregar_turno():
             # El animal es mayor a 4 meses, se programa el turno 1 año después
             fecha_turno = calcular_fecha_turno(366)
 
-    nuevo_turno = Turno(horario=horario, motivo=motivo, estado="Pendiente",
+    nuevo_turno = Turno(horario=horario, motivo=motivo, estado="Pendiente", nomMascota=nomMascota, nomUsuario=nomUsuario, dniUser=dniUser,
                         fecha=fecha_turno, usuario_id=usuario_id, mascota_id=mascota_id)
     db.session.add(nuevo_turno)
     db.session.commit()
@@ -67,6 +79,9 @@ def obtener_turnos():
             "fecha": turno.fecha,
             "usuario_id": turno.usuario_id,
             "mascota_id": turno.mascota_id,
+            "nomMascota": turno.nomMascota,
+            "nomUsuario": turno.nomUsuario,
+            "dniUser": turno.dniUser
         }
         for turno in turnos
     ]
@@ -86,7 +101,10 @@ def obtener_turno_by_id(id):
         "fecha": turno.fecha,
         "usuario_id": turno.usuario_id,
         "mascota_id": turno.mascota_id,
-        "mascota": mascota.to_dict()
+        "mascota": mascota.to_dict(),
+        "nomMascota": turno.nomMascota,
+        "nomUsuario": turno.nomUsuario,
+        "dniUser": turno.dniUser
     }
 
     return jsonify(turno_json)
