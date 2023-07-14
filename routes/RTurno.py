@@ -156,7 +156,7 @@ def cambiar_estado_turno(id):
 
     db.session.commit()
     enviar_email(usuario_remitente.email, f"Turno {estado_nuevo}",
-                 f"El turno ha sido {estado_nuevo}. Para mayor información, contactese con {usuario_actual['email']}")
+                 f"El turno ha sido {estado_nuevo}.")
 
     return jsonify({"message": f"Turno {estado_nuevo} satisfactoriamente"})
 
